@@ -23,10 +23,22 @@ Route::get('/', function () {
     if ($persentase > 100) $persentase = 100;
 
     return view('welcome', compact('kuotaTotal', 'pendaftarMasuk', 'sisaKursi', 'persentase'));
-});
+})->name('welcome');
 
 // ----------------------------------------------------
 // Rute untuk Tamu (Belum Login)
+// Rute untuk halaman Panduan Pendaftaran (Publik)
+Route::get('/panduan', function () {
+    return view('panduan');
+})->name('panduan');
+
+Route::get('/tentang-kami', function () {
+    return view('tentangkami');
+})->name('tentang');
+
+Route::get('/kontak', function () {
+    return view('kontak');
+})->name('kontak');
 // ----------------------------------------------------
 require __DIR__.'/auth.php';
 
@@ -94,4 +106,6 @@ Route::get('/admin/reports', [App\Http\Controllers\AdminController::class, 'repo
 
 // Rute untuk download detail santri dalam format PDF/Print
 Route::get('/admin/applicants/{id}/download', [App\Http\Controllers\AdminController::class, 'downloadDetail'])->name('admin.applicants.download');
+
+
 });

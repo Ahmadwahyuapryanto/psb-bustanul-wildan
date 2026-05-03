@@ -13,10 +13,10 @@
     <nav class="bg-emerald-900 text-white py-4 px-6 md:px-12 flex justify-between items-center">
         <div class="font-bold text-xl tracking-wider">Bustanul Wildan</div>
         <div class="hidden md:flex space-x-6 text-sm font-medium">
-            <a href="#" class="text-amber-500 border-b-2 border-amber-500 pb-1">Pendaftaran</a>
-            <a href="#" class="hover:text-amber-400 transition">Tutorial</a>
-            <a href="#" class="hover:text-amber-400 transition">Tentang Kami</a>
-            <a href="#" class="hover:text-amber-400 transition">Kontak</a>
+            <a href="{{ route('welcome') }}" class="text-amber-500 border-b-2 border-amber-500 pb-1">Pendaftaran</a>
+            <a href="{{ route('panduan') }}" class="hover:text-amber-400 transition">Panduan</a>
+            <a href="{{ route('tentang') }}" class="hover:text-amber-400 transition">Tentang Kami</a>
+            <a href="{{ route('kontak') }}" class="hover:text-amber-400 transition">Kontak</a>
         </div>
         <div class="flex items-center space-x-4">
             <a href="{{ route('login') }}" class="text-sm font-semibold hover:text-amber-400">Login</a>
