@@ -350,5 +350,85 @@ class AdminController extends Controller
 
         return view('admin.reports', compact('totalPendaftar', 'totalLulus', 'totalDitolak', 'totalProses', 'logPendaftar'));
     }
-    
+
+    // =====================================================================
+    // FUNGSI BARU: Mengatur Jadwal Tes & Wawancara + Notifikasi WA
+    // =====================================================================
+    public function setSchedule(Request $request)
+    {
+        $request->validate([
+            'selected_santri' => 'required|array', 
+            'jadwal_tes' => 'required|date',       
+        ]);
+
+        $santris = Santri::whereIn('id', $request->selected_santri)->get();
+        $jadwal = Carbon::parse($request->jadwal_tes);
+        $tanggalFormat = $jadwal->translatedFormat('l, d F Y');
+        $waktuFormat = $jadwal->format('H:i') . ' WIB';
+
+        $count = 0;
+        $token = env('FONNTE_TOKEN'); 
+        $pesanGagal = []; // Variabel baru untuk menampung daftar WA yang gagal
+
+        foreach ($santris as $santri) {
+            // 1. Simpan jadwal ke database (Pasti berjalan)
+            $santri->jadwal_tes = $jadwal;
+            $santri->save();
+            $count++;
+
+            // 2. Logika Pengiriman WA
+            if ($request->has('kirim_wa') && $request->kirim_wa == 1) {
+                
+                // Cek apakah token ada
+                if (empty($token)) {
+                    return redirect()->back()->with('error', 'Gagal: Token Fonnte belum dipasang di file .env!');
+                }
+
+                // Cek apakah nomor WA ada di database (Sesuaikan nama kolom 'no_wa' dengan tabelmu)
+                $nomorWa = $santri->user->no_wa ?? null; 
+                
+                if(empty($nomorWa)) {
+                    $pesanGagal[] = $santri->nama_lengkap . ' (Nomor WA Kosong)';
+                    continue; // Lewati santri ini, lanjut ke santri berikutnya
+                }
+
+                // Susun Pesan
+                $pesan = "Assalamualaikum Wr. Wb.,\n\n";
+                $pesan .= "Bapak/Ibu Wali dari Ananda *" . $santri->nama_lengkap . "*.\n\n";
+                $pesan .= "Kami menginformasikan bahwa jadwal Tes/Wawancara seleksi penerimaan santri baru PPTQ Bustanul Wildan telah ditetapkan pada:\n\n";
+                $pesan .= "📅 *Tanggal:* " . $tanggalFormat . "\n";
+                $pesan .= "⏰ *Waktu:* " . $waktuFormat . "\n\n";
+                $pesan .= "Mohon hadir tepat waktu. Terima kasih.";
+
+                // Eksekusi API
+                try {
+                    $response = Http::withHeaders([
+                        'Authorization' => $token
+                    ])->post('https://api.fonnte.com/send', [
+                        'target' => $nomorWa,
+                        'message' => $pesan,
+                        'countryCode' => '62',
+                    ]);
+
+                    // Tangkap pesan gagal langsung dari server Fonnte
+                    $responseData = $response->json();
+                    if (!$response->successful() || (isset($responseData['status']) && $responseData['status'] == false)) {
+                         $pesanGagal[] = $santri->nama_lengkap . ' (Ditolak API Fonnte: ' . ($responseData['reason'] ?? 'Unknown error') . ')';
+                    }
+
+                } catch (\Exception $e) {
+                    // Tangkap pesan gagal jika internet mati atau server Fonnte down
+                    $pesanGagal[] = $santri->nama_lengkap . ' (Koneksi Error: ' . $e->getMessage() . ')';
+                }
+            }
+        }
+
+        // 3. Tentukan pesan yang muncul di layar admin
+        if (count($pesanGagal) > 0) {
+            $errorPesan = 'Jadwal tersimpan, TAPI pesan WhatsApp GAGAL terkirim ke: ' . implode(', ', $pesanGagal);
+            return redirect()->back()->with('error', $errorPesan);
+        }
+
+        return redirect()->back()->with('success', 'Jadwal tes berhasil diatur dan WA telah terkirim ke ' . $count . ' santri.');
+    }
 }

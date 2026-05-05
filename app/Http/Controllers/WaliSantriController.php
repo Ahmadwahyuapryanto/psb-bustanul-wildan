@@ -14,4 +14,10 @@ class WaliSantriController extends Controller
 
         return view('dashboard', compact('santri'));
     }
+
+    public function bantuan()
+    {
+        // Menampilkan halaman panduan/bantuan untuk wali santri
+        return view('wali-santri.bantuan');
+    }
 }

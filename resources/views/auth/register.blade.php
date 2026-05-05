@@ -77,15 +77,36 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                        <!-- KOLOM KATA SANDI DENGAN FITUR SHOW/HIDE -->
                         <div>
                             <label for="password" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Kata Sandi</label>
-                            <input id="password" type="password" name="password" placeholder="••••••••" required class="w-full px-4 py-3 bg-gray-100 border-transparent rounded-xl focus:bg-white focus:border-[#0B3B2C] focus:ring-2 focus:ring-[#0B3B2C]/20 transition text-sm">
+                            <div class="relative">
+                                <!-- Ditambahkan pr-12 (padding-right) agar teks tidak tertimpa ikon -->
+                                <input id="password" type="password" name="password" placeholder="••••••••" required class="w-full px-4 py-3 pr-12 bg-gray-100 border-transparent rounded-xl focus:bg-white focus:border-[#0B3B2C] focus:ring-2 focus:ring-[#0B3B2C]/20 transition text-sm">
+                                <!-- Tombol Ikon Mata -->
+                                <button type="button" onclick="togglePassword('password', 'eye-icon-password')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#0B3B2C] focus:outline-none">
+                                    <svg id="eye-icon-password" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                             @error('password') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
+                        <!-- KOLOM KONFIRMASI SANDI DENGAN FITUR SHOW/HIDE -->
                         <div>
                             <label for="password_confirmation" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Konfirmasi Sandi</label>
-                            <input id="password_confirmation" type="password" name="password_confirmation" placeholder="••••••••" required class="w-full px-4 py-3 bg-gray-100 border-transparent rounded-xl focus:bg-white focus:border-[#0B3B2C] focus:ring-2 focus:ring-[#0B3B2C]/20 transition text-sm">
+                            <div class="relative">
+                                <input id="password_confirmation" type="password" name="password_confirmation" placeholder="••••••••" required class="w-full px-4 py-3 pr-12 bg-gray-100 border-transparent rounded-xl focus:bg-white focus:border-[#0B3B2C] focus:ring-2 focus:ring-[#0B3B2C]/20 transition text-sm">
+                                <!-- Tombol Ikon Mata -->
+                                <button type="button" onclick="togglePassword('password_confirmation', 'eye-icon-confirm')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#0B3B2C] focus:outline-none">
+                                    <svg id="eye-icon-confirm" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -120,5 +141,30 @@
             <a href="#" class="hover:text-[#0B3B2C]">Syarat & Ketentuan</a>
         </div>
     </footer>
+
+    <!-- Script JavaScript untuk Fitur Tampilkan/Sembunyikan Sandi -->
+    <script>
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            // Jika tipe saat ini adalah password, ubah jadi text (lihat sandi)
+            if (input.type === 'password') {
+                input.type = 'text';
+                // Mengubah icon menjadi mata yang dicoret (eye-slash)
+                icon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                `;
+            } else {
+                // Jika tipe saat ini text, kembalikan ke password (sembunyikan sandi)
+                input.type = 'password';
+                // Mengubah icon kembali menjadi mata terbuka
+                icon.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                `;
+            }
+        }
+    </script>
 </body>
 </html>

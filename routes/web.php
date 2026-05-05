@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PendaftaranController;
 use App\Models\Santri;
+use App\Http\Controllers\WaliSantriController;
+
 
 Route::get('/', function () {
     // Tentukan total kuota (Sesuai dengan desainmu yaitu 150, atau ubah jadi 1500 jika mengikuti data admin)
@@ -106,6 +108,7 @@ Route::get('/admin/reports', [App\Http\Controllers\AdminController::class, 'repo
 
 // Rute untuk download detail santri dalam format PDF/Print
 Route::get('/admin/applicants/{id}/download', [App\Http\Controllers\AdminController::class, 'downloadDetail'])->name('admin.applicants.download');
-
+Route::post('/admin/selection/schedule', [App\Http\Controllers\AdminController::class, 'setSchedule'])->name('admin.selection.schedule');
+Route::get('/dashboard/wali-santri/bantuan', [WaliSantriController::class, 'bantuan'])->name('wali.bantuan');
 
 });

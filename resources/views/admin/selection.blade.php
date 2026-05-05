@@ -9,6 +9,7 @@
 </head>
 <body class="bg-[#F8FAFC] text-gray-800 font-figtree flex h-screen overflow-hidden">
 
+    <!-- ... (Sidebar dan Header tetap sama seperti sebelumnya) ... -->
     <aside class="w-64 bg-white border-r border-gray-100 flex flex-col justify-between flex-shrink-0 h-full z-20">
         <div>
             <div class="px-8 py-6 flex items-center gap-3 mb-4">
@@ -139,90 +140,137 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-[#0B3B2C]">
-                            @if($tab == 'waitlist') Daftar Cadangan @elseif($tab == 'finalized') Daftar Final @else Daftar Seleksi Calon Santri @endif
-                        </h3>
-                        <div class="flex gap-2">
-                            <form action="{{ route('admin.selection') }}" method="GET" class="relative">
-                                <input type="hidden" name="tab" value="{{ $tab }}">
-                                <select name="filter" onchange="this.form.submit()" class="bg-white border border-gray-200 px-4 py-2 rounded-lg text-xs font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm cursor-pointer focus:ring-0">
-                                    <option value="">Sortir Terbaru</option>
-                                    <option value="asc">A - Z</option>
-                                </select>
-                            </form>
-                            
-                            <form action="{{ route('admin.selection.blast') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-[#0B3B2C] text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-[#082a20] transition shadow-sm" onclick="return confirm('Anda yakin ingin mengirim pesan WhatsApp massal ke pendaftar yang Lulus?')">
+                    <!-- FORMULIR MASSAL UNTUK JADWAL -->
+                    <form id="scheduleForm" action="{{ route('admin.selection.schedule') }}" method="POST">
+                        @csrf
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-[#0B3B2C]">
+                                @if($tab == 'waitlist') Daftar Cadangan @elseif($tab == 'finalized') Daftar Final @else Daftar Seleksi Calon Santri @endif
+                            </h3>
+                            <div class="flex gap-2">
+                                <div class="relative">
+                                    <input type="hidden" name="tab" value="{{ $tab }}">
+                                    <!-- Select Filter (Dipindahkan ke luar form massal) -->
+                                </div>
+                                
+                                <!-- Tombol Atur Jadwal (Awalnya Disabled) -->
+                                <button type="button" id="btnAturJadwal" disabled class="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-blue-700 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Atur Jadwal
+                                </button>
+                                <!-- Tombol Blast WA yang sudah ditambah formnovalidate -->
+                                <button type="submit" formnovalidate formaction="{{ route('admin.selection.blast') }}" class="bg-[#0B3B2C] text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-[#082a20] transition shadow-sm" onclick="return confirm('Anda yakin ingin mengirim pesan WhatsApp massal ke pendaftar yang Lulus?')">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg> Blast WA
                                 </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 mb-8">
-                        @forelse($pendaftars as $santri)
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition relative z-0">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
-                                    {{ strtoupper(substr($santri->nama_lengkap, 0, 2)) }}
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-gray-900 text-sm">{{ $santri->nama_lengkap }}</h4>
-                                    <p class="text-[10px] text-gray-500 mt-0.5">ID: BW26-{{ str_pad($santri->id, 3, '0', STR_PAD_LEFT) }} • Jalur: Reguler</p>
-                                </div>
                             </div>
-                            
-                            <div class="flex items-center gap-2">
-                                <form action="{{ route('admin.selection.update', $santri->id) }}" method="POST" class="flex gap-2">
-                                    @csrf
-                                    <button type="submit" name="status" value="lulus" 
+                        </div>
+
+                        <div class="space-y-4 mb-8">
+                            <!-- CHECKBOX SELECT ALL (Opsional) -->
+                            @if(count($pendaftars) > 0)
+                            <div class="px-4 flex items-center gap-3">
+                                <input type="checkbox" id="selectAll" class="w-4 h-4 text-[#0B3B2C] bg-white border-gray-300 rounded focus:ring-[#0B3B2C] cursor-pointer">
+                                <label for="selectAll" class="text-xs font-bold text-gray-500 uppercase tracking-widest cursor-pointer">Pilih Semua</label>
+                            </div>
+                            @endif
+
+                            @forelse($pendaftars as $santri)
+                            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition relative z-0">
+                                <div class="flex items-center gap-4">
+                                    <!-- CHECKBOX SANTRI -->
+                                    <input type="checkbox" name="selected_santri[]" value="{{ $santri->id }}" class="santri-checkbox w-4 h-4 text-[#0B3B2C] bg-white border-gray-300 rounded focus:ring-[#0B3B2C] cursor-pointer">
+                                    
+                                    <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+                                        {{ strtoupper(substr($santri->nama_lengkap, 0, 2)) }}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 text-sm">{{ $santri->nama_lengkap }}</h4>
+                                        <p class="text-[10px] text-gray-500 mt-0.5">ID: BW26-{{ str_pad($santri->id, 3, '0', STR_PAD_LEFT) }} • Jalur: Reguler</p>
+                                        <!-- Tampilkan jadwal jika ada (Anda perlu menyesuaikan ini dengan kolom database Anda) -->
+                                        @if(isset($santri->jadwal_tes))
+                                        <p class="text-[10px] text-blue-600 font-semibold mt-1">Jadwal: {{ \Carbon\Carbon::parse($santri->jadwal_tes)->translatedFormat('l, d F Y H:i') }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <!-- Aksi Individual (Tidak Terpengaruh Form Massal) -->
+                                    <button type="submit" formnovalidate formaction="{{ route('admin.selection.update', $santri->id) }}" name="status" value="lulus" 
                                             class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition border 
                                             {{ $santri->status_pendaftaran == 'lulus' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-white text-gray-400 border-gray-200 hover:border-emerald-500 hover:text-emerald-600' }}">
                                         Lulus
                                     </button>
-                                    <button type="submit" name="status" value="cadangan" 
+
+                                    <button type="submit" formnovalidate formaction="{{ route('admin.selection.update', $santri->id) }}" name="status" value="cadangan" 
                                             class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition border 
                                             {{ $santri->status_pendaftaran == 'cadangan' ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-white text-gray-400 border-gray-200 hover:border-amber-500 hover:text-amber-600' }}">
                                         Cadangan
                                     </button>
-                                    <button type="submit" name="status" value="tidak lulus" 
+
+                                    <button type="submit" formnovalidate formaction="{{ route('admin.selection.update', $santri->id) }}" name="status" value="tidak lulus" 
                                             class="px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition border 
                                             {{ $santri->status_pendaftaran == 'tidak lulus' ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-white text-gray-400 border-gray-200 hover:border-rose-500 hover:text-rose-600' }}">
                                         Tidak Lulus
                                     </button>
-                                </form>
 
-                                <div class="relative group inline-block text-left ml-2 z-10" tabindex="0">
-                                    <button class="text-gray-400 hover:text-[#0B3B2C] focus:outline-none p-2 rounded-lg hover:bg-gray-100 transition">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                                    </button>
-                                    
-                                    <div class="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all z-50 text-left overflow-hidden">
-                                        <a href="{{ route('admin.verification', $santri->id) }}" class="block px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
-                                            Verifikasi Berkas
-                                        </a>
-                                        <a href="{{ route('admin.applicants.download', $santri->id) }}" target="_blank" class="block px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-700 flex justify-between items-center">
-                                            Download Detail
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                        </a>
+                                    <div class="relative group inline-block text-left ml-2 z-10" tabindex="0">
+                                        <button type="button" class="text-gray-400 hover:text-[#0B3B2C] focus:outline-none p-2 rounded-lg hover:bg-gray-100 transition">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                        </button>
+                                        
+                                        <div class="absolute right-0 top-full mt-1 w-44 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all z-50 text-left overflow-hidden">
+                                            <a href="{{ route('admin.verification', $santri->id) }}" class="block px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">
+                                                Verifikasi Berkas
+                                            </a>
+                                            <a href="{{ route('admin.applicants.download', $santri->id) }}" target="_blank" class="block px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-700 flex justify-between items-center">
+                                                Download Detail
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                                </div>
-                        </div>
-                        @empty
-                        <div class="bg-white p-8 text-center rounded-2xl shadow-sm border border-gray-100">
-                            <p class="text-gray-500 text-sm">Belum ada data pendaftar pada tab ini.</p>
-                        </div>
-                        @endforelse
+                            </div>
+                            @empty
+                            <div class="bg-white p-8 text-center rounded-2xl shadow-sm border border-gray-100">
+                                <p class="text-gray-500 text-sm">Belum ada data pendaftar pada tab ini.</p>
+                            </div>
+                            @endforelse
 
-                        <div>
-                            {{ $pendaftars->links('pagination::tailwind') }}
+                            <div>
+                                {{ $pendaftars->links('pagination::tailwind') }}
+                            </div>
                         </div>
-                    </div>
+
+                        <!-- MODAL PENGATURAN JADWAL -->
+                        <div id="jadwalModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] hidden opacity-0 transition-opacity duration-300">
+                            <div class="bg-white rounded-3xl shadow-xl w-full max-w-md mx-4 overflow-hidden transform scale-95 transition-transform duration-300">
+                                <div class="bg-[#0B3B2C] p-6 text-white">
+                                    <h3 class="text-lg font-bold">Atur Jadwal Tes/Wawancara</h3>
+                                    <p class="text-xs text-emerald-100/80 mt-1">Pilih tanggal dan waktu untuk <span id="selectedCount" class="font-bold">0</span> santri terpilih.</p>
+                                </div>
+                                <div class="p-6">
+                                    <div class="mb-4">
+                                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">Tanggal & Waktu Tes</label>
+                                        <input type="datetime-local" name="jadwal_tes" required 
+                                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition text-sm">
+                                    </div>
+                                    <div class="mb-6">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" name="kirim_wa" value="1" checked class="w-4 h-4 text-[#0B3B2C] bg-white border-gray-300 rounded focus:ring-[#0B3B2C]">
+                                            <span class="text-sm font-medium text-gray-700">Kirim pemberitahuan via WhatsApp</span>
+                                        </label>
+                                    </div>
+                                    <div class="flex justify-end gap-3">
+                                        <button type="button" id="btnBatal" class="px-5 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition">Batal</button>
+                                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition shadow-md">Simpan & Kirim</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
 
+                <!-- ... (Sidebar Kanan Laporan dan Aktivitas tetap sama) ... -->
                 <div class="w-full lg:w-[320px] flex flex-col gap-6">
                     
                     <div class="bg-[#0B3B2C] rounded-3xl p-6 shadow-xl text-white">
@@ -300,5 +348,81 @@
         </div>
     </main>
 
+    <!-- Script Interaktif untuk Checkbox dan Modal -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.santri-checkbox');
+            const btnAturJadwal = document.getElementById('btnAturJadwal');
+            const modal = document.getElementById('jadwalModal');
+            const modalInner = modal.querySelector('div');
+            const btnBatal = document.getElementById('btnBatal');
+            const selectedCountSpan = document.getElementById('selectedCount');
+
+            // Fungsi untuk memeriksa status checkbox
+            function checkStatus() {
+                let checkedCount = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) checkedCount++;
+                });
+
+                // Update jumlah yang dipilih di modal
+                selectedCountSpan.textContent = checkedCount;
+
+                // Aktifkan/nonaktifkan tombol Atur Jadwal
+                if (checkedCount > 0) {
+                    btnAturJadwal.removeAttribute('disabled');
+                } else {
+                    btnAturJadwal.setAttribute('disabled', 'disabled');
+                    if (selectAll) selectAll.checked = false; // Uncheck "Pilih Semua" jika tidak ada yang dipilih
+                }
+            }
+
+            // Event listener untuk checkbox individual
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', checkStatus);
+            });
+
+            // Event listener untuk "Pilih Semua"
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    checkboxes.forEach(cb => {
+                        cb.checked = this.checked;
+                    });
+                    checkStatus();
+                });
+            }
+
+            // Tampilkan Modal
+            btnAturJadwal.addEventListener('click', function() {
+                modal.classList.remove('hidden');
+                // Sedikit delay untuk memungkinkan display:block diterapkan sebelum opacity
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    modalInner.classList.remove('scale-95');
+                }, 10);
+            });
+
+            // Sembunyikan Modal (Fungsi Helper)
+            function hideModal() {
+                modal.classList.add('opacity-0');
+                modalInner.classList.add('scale-95');
+                // Tunggu transisi selesai sebelum menambahkan hidden
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+
+            // Batal dari dalam Modal
+            btnBatal.addEventListener('click', hideModal);
+
+            // Tutup modal jika klik di luar area konten modal
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    hideModal();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
