@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Berkas;
 use App\Models\OrangTua;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Pendidikan; // Wajib ditambahkan untuk fitur hapus file lama
+use App\Models\Pendidikan; 
 
 class PendaftaranController extends Controller
 {
@@ -37,18 +37,18 @@ class PendaftaranController extends Controller
             'pas_foto' => 'image|mimes:jpeg,png,jpg|max:2048' // Max 2MB
         ]);
 
-        // Proses Upload Foto (Jika ada)
+        // Proses Upload Foto (Jika ada) langsung ke Supabase
         if ($request->hasFile('pas_foto')) {
             // Cek apakah user sudah punya data & foto lama
             $santriLama = Santri::where('user_id', Auth::id())->first();
             
-            // Hapus foto lama dari local storage jika ada, untuk menghemat ruang
-            if ($santriLama && $santriLama->pas_foto && Storage::disk('public')->exists($santriLama->pas_foto)) {
-                Storage::disk('public')->delete($santriLama->pas_foto);
+            // Hapus foto lama dari Supabase jika ada, untuk menghemat ruang
+            if ($santriLama && $santriLama->pas_foto && Storage::disk('supabase')->exists($santriLama->pas_foto)) {
+                Storage::disk('supabase')->delete($santriLama->pas_foto);
             }
 
-            // Simpan foto baru ke folder storage/app/public/pas_foto_santri
-            $path = $request->file('pas_foto')->store('pas_foto_santri', 'public');
+            // Simpan foto baru ke folder pas_foto_santri di Supabase
+            $path = $request->file('pas_foto')->store('pas_foto_santri', 'supabase');
             $validatedData['pas_foto'] = $path;
         }
 
@@ -96,48 +96,48 @@ class PendaftaranController extends Controller
         return redirect()->route('pendaftaran.step3')->with('success', 'Data Orang Tua berhasil disimpan!');
     }
 
-// 2. PERBAIKI FUNGSI TAMPILAN (createStepThree)
-public function createStepThree()
-{
-    $santri = Santri::where('user_id', Auth::id())->first();
-    
-    if (!$santri) {
-        return redirect()->route('pendaftaran.step1');
+    // PERBAIKI FUNGSI TAMPILAN (createStepThree)
+    public function createStepThree()
+    {
+        $santri = Santri::where('user_id', Auth::id())->first();
+        
+        if (!$santri) {
+            return redirect()->route('pendaftaran.step1');
+        }
+
+        // Ambil data pendidikan lama agar bisa muncul di form
+        $pendidikan = Pendidikan::where('santri_id', $santri->id)->first();
+
+        // PASTIKAN INI step3, bukan step4
+        return view('pendaftaran.step3', compact('pendidikan')); 
     }
 
-    // Ambil data pendidikan lama agar bisa muncul di form
-    $pendidikan = Pendidikan::where('santri_id', $santri->id)->first();
+    // PERBAIKI FUNGSI SIMPAN (storeStepThree)
+    public function storeStepThree(Request $request)
+    {
+        // Ubah validasi menjadi 'nullable' agar tidak wajib diisi (cocok untuk SD)
+        $validated = $request->validate([
+            'nama_sekolah'   => 'nullable|string|max:255',
+            'tahun_lulus'    => 'nullable|numeric',
+            'alamat_sekolah' => 'nullable|string',
+            'prestasi'       => 'nullable|string',
+        ]);
 
-    // PASTIKAN INI step3, bukan step4
-    return view('pendaftaran.step3', compact('pendidikan')); 
-}
+        $santri = Santri::where('user_id', Auth::id())->firstOrFail();
+        
+        // Simpan data ke database
+        Pendidikan::updateOrCreate(
+            ['santri_id' => $santri->id], 
+            $validated
+        );
 
-// 3. PERBAIKI FUNGSI SIMPAN (storeStepThree)
-public function storeStepThree(Request $request)
-{
-    // Ubah validasi menjadi 'nullable' agar tidak wajib diisi (cocok untuk SD)
-    // Hapus 'nilai_rata_rata' dari sini agar tidak menyebabkan reload terus-menerus
-    $validated = $request->validate([
-        'nama_sekolah'   => 'nullable|string|max:255',
-        'tahun_lulus'    => 'nullable|numeric',
-        'alamat_sekolah' => 'nullable|string',
-        'prestasi'       => 'nullable|string',
-    ]);
+        // Update status pendaftaran pendaftar
+        $santri->update(['tahap_pendaftaran' => 4]);
 
-    $santri = Santri::where('user_id', Auth::id())->firstOrFail();
-    
-    // Simpan data ke database
-    Pendidikan::updateOrCreate(
-        ['santri_id' => $santri->id], 
-        $validated
-    );
+        // Berlanjut ke Step 4
+        return redirect()->route('pendaftaran.step4')->with('success', 'Riwayat Pendidikan berhasil disimpan!');
+    }
 
-    // Update status pendaftaran pendaftar
-    $santri->update(['tahap_pendaftaran' => 4]);
-
-    // Berlanjut ke Step 4
-    return redirect()->route('pendaftaran.step4')->with('success', 'Riwayat Pendidikan berhasil disimpan!');
-}
     // Menampilkan halaman Langkah 4: Dokumen
     public function createStepFour()
     {
@@ -154,7 +154,7 @@ public function storeStepThree(Request $request)
         return view('pendaftaran.step4', compact('santri', 'berkas_terunggah'));
     }
 
-    // Menyimpan dokumen Langkah 4
+    // Menyimpan dokumen Langkah 4 ke Supabase
     public function storeStepFour(Request $request)
     {
         $request->validate([
@@ -167,11 +167,11 @@ public function storeStepThree(Request $request)
         $santri = Santri::where('user_id', Auth::id())->firstOrFail();
         $jenis_dokumen = ['akta_kelahiran', 'kartu_keluarga', 'ijazah'];
 
-        // Looping untuk menyimpan masing-masing berkas
+        // Looping untuk menyimpan masing-masing berkas ke Supabase
         foreach ($jenis_dokumen as $jenis) {
             if ($request->hasFile($jenis)) {
-                // Simpan ke storage/app/public/berkas_santri
-                $path = $request->file($jenis)->store('berkas_santri', 'public');
+                // Simpan ke bucket Supabase
+                $path = $request->file($jenis)->store('berkas_santri', 'supabase');
                 
                 // Simpan atau update ke tabel berkas
                 Berkas::updateOrCreate(
@@ -183,12 +183,12 @@ public function storeStepThree(Request $request)
 
         // Jika wali santri mengunggah ulang Pas Foto
         if ($request->hasFile('pas_foto')) {
-            // Hapus foto lama jika ada
-            if ($santri->pas_foto && Storage::disk('public')->exists($santri->pas_foto)) {
-                Storage::disk('public')->delete($santri->pas_foto);
+            // Hapus foto lama di Supabase jika ada
+            if ($santri->pas_foto && Storage::disk('supabase')->exists($santri->pas_foto)) {
+                Storage::disk('supabase')->delete($santri->pas_foto);
             }
 
-            $path = $request->file('pas_foto')->store('pas_foto_santri', 'public');
+            $path = $request->file('pas_foto')->store('pas_foto_santri', 'supabase');
             $santri->update(['pas_foto' => $path]);
         }
 
