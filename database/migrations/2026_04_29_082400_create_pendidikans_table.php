@@ -15,10 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('santri_id'); // Relasi ke tabel santri
             $table->string('nama_sekolah');
-            $table->string('npsn')->nullable();
             $table->text('alamat_sekolah');
             $table->year('tahun_lulus');
-            $table->decimal('nilai_rata_rata', 5, 2); // Format 00.00
             $table->text('prestasi')->nullable();
             $table->timestamps();
 
