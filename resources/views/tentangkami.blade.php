@@ -23,20 +23,47 @@
 </head>
 <body class="antialiased bg-[#F8FAFC] text-gray-800 font-figtree">
 
-    <!-- NAVBAR (Tidak sticky, ikut bergulir) -->
+    <!-- NAVBAR (Sudah Diperbarui Menjadi Responsif) -->
     <nav class="bg-emerald-900 text-white py-4 px-6 md:px-12 flex justify-between items-center">
         <div class="font-bold text-xl tracking-wider">Bustanul Wildan</div>
+        
+        <!-- Menu Desktop -->
         <div class="hidden md:flex space-x-6 text-sm font-medium">
             <a href="{{ route('welcome') }}" class="hover:text-amber-400 transition">Pendaftaran</a>
             <a href="{{ route('panduan') }}" class="hover:text-amber-400 transition">Panduan</a>
             <a href="{{ route('tentang') }}" class="text-amber-500 border-b-2 border-amber-500 pb-1 transition">Tentang Kami</a>
             <a href="{{ route('kontak') }}" class="hover:text-amber-400 transition">Kontak</a>
         </div>
-        <div class="flex items-center space-x-4">
+        
+        <!-- Tombol Aksi Desktop -->
+        <div class="hidden md:flex items-center space-x-4">
             <a href="{{ route('login') }}" class="text-sm font-semibold hover:text-amber-400">Login</a>
             <a href="{{ route('register') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition shadow-md">Daftar Sekarang</a>
         </div>
+
+        <!-- Tombol Menu Burger (Hanya Muncul di HP) -->
+        <div class="md:hidden flex items-center">
+            <button id="mobile-menu-button" class="text-white hover:text-amber-400 focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
     </nav>
+
+    <!-- Menu Dropdown Mobile (Tersembunyi secara default) -->
+    <div id="mobile-menu" class="hidden md:hidden bg-emerald-800 text-white border-t border-emerald-700 shadow-lg">
+        <div class="px-6 py-4 space-y-3 text-sm">
+            <a href="{{ route('welcome') }}" class="block hover:text-amber-400 border-b border-emerald-700 pb-2">Pendaftaran</a>
+            <a href="{{ route('panduan') }}" class="block hover:text-amber-400 border-b border-emerald-700 pb-2">Panduan</a>
+            <a href="{{ route('tentang') }}" class="block text-amber-500 font-semibold border-b border-emerald-700 pb-2">Tentang Kami</a>
+            <a href="{{ route('kontak') }}" class="block hover:text-amber-400 border-b border-emerald-700 pb-2">Kontak</a>
+            <div class="pt-2 flex flex-col space-y-3">
+                <a href="{{ route('login') }}" class="block text-center bg-emerald-900 hover:bg-emerald-700 py-2.5 rounded-md font-semibold">Login</a>
+                <a href="{{ route('register') }}" class="block text-center bg-amber-600 hover:bg-amber-700 py-2.5 rounded-md font-semibold text-white">Daftar Sekarang</a>
+            </div>
+        </div>
+    </div>
 
     <!-- HERO SECTION -->
     <section class="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
@@ -147,7 +174,7 @@
         </div>
     </section>
 
-    <!-- FASILITAS SECTION (Sudah Diperbaiki Jarak dan Grid-nya) -->
+    <!-- FASILITAS SECTION -->
     <section class="max-w-7xl mx-auto px-6 md:px-12 pt-10 mb-24 lg:mb-40">
         <div class="flex flex-col md:flex-row justify-between items-end mb-10 reveal">
             <div>
@@ -226,8 +253,19 @@
         </div>
     </footer>
 
-    <!-- SCRIPT ANIMASI -->
+    <!-- SCRIPT GABUNGAN: MENU BURGER & ANIMASI SCROLL -->
     <script>
+        // 1. Skrip Menu Burger Mobile
+        const btn = document.getElementById('mobile-menu-button');
+        const menu = document.getElementById('mobile-menu');
+
+        if(btn && menu) {
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        }
+
+        // 2. Skrip Animasi Scroll (Sesuai kode aslimu)
         document.addEventListener("DOMContentLoaded", function() {
             const reveals = document.querySelectorAll(".reveal");
             const revealOptions = {

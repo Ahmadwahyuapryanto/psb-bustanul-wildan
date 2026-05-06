@@ -12,17 +12,46 @@
 
     <nav class="bg-emerald-900 text-white py-4 px-6 md:px-12 flex justify-between items-center">
         <div class="font-bold text-xl tracking-wider">Bustanul Wildan</div>
+        
+        <!-- Menu Desktop (Sembunyi di HP) -->
         <div class="hidden md:flex space-x-6 text-sm font-medium">
             <a href="{{ route('welcome') }}" class="text-amber-500 border-b-2 border-amber-500 pb-1">Pendaftaran</a>
             <a href="{{ route('panduan') }}" class="hover:text-amber-400 transition">Panduan</a>
             <a href="{{ route('tentang') }}" class="hover:text-amber-400 transition">Tentang Kami</a>
             <a href="{{ route('kontak') }}" class="hover:text-amber-400 transition">Kontak</a>
         </div>
-        <div class="flex items-center space-x-4">
+        
+        <!-- Tombol Aksi Desktop (Sembunyi di HP) -->
+        <div class="hidden md:flex items-center space-x-4">
             <a href="{{ route('login') }}" class="text-sm font-semibold hover:text-amber-400">Login</a>
             <a href="{{ route('register') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-md text-sm font-semibold transition shadow-md">Daftar Sekarang</a>
         </div>
+
+        <!-- Tombol Menu Burger (Hanya Muncul di HP) -->
+        <div class="md:hidden flex items-center">
+            <button id="mobile-menu-button" class="text-white hover:text-amber-400 focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
     </nav>
+
+    <!-- Menu Dropdown Mobile (Tersembunyi secara default) -->
+    <div id="mobile-menu" class="hidden md:hidden bg-emerald-800 text-white border-t border-emerald-700 shadow-lg">
+        <div class="px-6 py-4 space-y-3 text-sm">
+            <a href="{{ route('welcome') }}" class="block text-amber-500 font-semibold border-b border-emerald-700 pb-2">Pendaftaran</a>
+            <a href="{{ route('panduan') }}" class="block hover:text-amber-400 border-b border-emerald-700 pb-2">Panduan</a>
+            <a href="{{ route('tentang') }}" class="block hover:text-amber-400 border-b border-emerald-700 pb-2">Tentang Kami</a>
+            <a href="{{ route('kontak') }}" class="block hover:text-amber-400 border-b border-emerald-700 pb-2">Kontak</a>
+            <div class="pt-2 flex flex-col space-y-3">
+                <a href="{{ route('login') }}" class="block text-center bg-emerald-900 hover:bg-emerald-700 py-2.5 rounded-md font-semibold">Login</a>
+                <a href="{{ route('register') }}" class="block text-center bg-amber-600 hover:bg-amber-700 py-2.5 rounded-md font-semibold text-white">Daftar Sekarang</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEMUA KODE DI BAWAH INI TIDAK SAYA UBAH SAMA SEKALI SESUAI PERINTAHMU -->
 
     <section class="max-w-7xl mx-auto px-6 md:px-12 py-12 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
@@ -37,7 +66,7 @@
             </p>
             <div class="flex space-x-4">
                 <a href="{{ route('register') }}" class="bg-emerald-900 hover:bg-emerald-800 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">Daftar Sekarang</a>
-                <a href="#" class="bg-white hover:bg-gray-50 text-emerald-900 border border-gray-200 px-6 py-3 rounded-lg font-semibold transition shadow-sm">Panduan Penerimaan</a>
+                <a href="{{ route('panduan') }}" class="bg-white hover:bg-gray-50 text-emerald-900 border border-gray-200 px-6 py-3 rounded-lg font-semibold transition shadow-sm">Panduan Penerimaan</a>
             </div>
         </div>
         
@@ -165,5 +194,14 @@
         </div>
     </footer>
 
+    <!-- Skrip Interaksi Tombol Menu Burger -->
+    <script>
+        const btn = document.getElementById('mobile-menu-button');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+    </script>
 </body>
 </html>

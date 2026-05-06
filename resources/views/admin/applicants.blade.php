@@ -8,8 +8,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-[#F8FAFC] text-gray-800 font-figtree flex h-screen overflow-hidden">
-
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col justify-between flex-shrink-0 h-full z-20">
+    
+    <!-- SIDEBAR DEKSTOP -->
+    <aside class="w-64 bg-white border-r border-gray-100 hidden md:flex flex-col justify-between flex-shrink-0 h-full z-20">
         <div>
             <div class="px-8 py-6 flex items-center gap-3 mb-4">
                 <div class="w-8 h-8 bg-[#0B3B2C] rounded-lg flex items-center justify-center text-white">
@@ -20,16 +21,15 @@
                     <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Admission 2026/27</p>
                 </div>
             </div>
-
             <nav class="px-4 space-y-1">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition {{ request()->routeIs('admin.dashboard') ? 'bg-gray-50 text-[#0B3B2C] font-bold border border-gray-100 shadow-sm relative overflow-hidden' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
                     @if(request()->routeIs('admin.dashboard')) <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#0B3B2C]"></div> @endif
                     <svg class="w-5 h-5 {{ request()->routeIs('admin.dashboard') ? 'text-[#0B3B2C]' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg> Statistics
                 </a>
                 
-                <a href="{{ route('admin.applicants') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition {{ request()->routeIs('admin.applicants') ? 'bg-gray-50 text-[#0B3B2C] font-bold border border-gray-100 shadow-sm relative overflow-hidden' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
-                    @if(request()->routeIs('admin.applicants')) <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#0B3B2C]"></div> @endif
-                    <svg class="w-5 h-5 {{ request()->routeIs('admin.applicants') ? 'text-[#0B3B2C]' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Applicants
+                <a href="{{ route('admin.applicants') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition {{ request()->routeIs('admin.applicants') || true ? 'bg-gray-50 text-[#0B3B2C] font-bold border border-gray-100 shadow-sm relative overflow-hidden' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#0B3B2C]"></div>
+                    <svg class="w-5 h-5 text-[#0B3B2C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Applicants
                 </a>
                 
                 <a href="{{ route('admin.verification') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition {{ request()->routeIs('admin.verification') ? 'bg-gray-50 text-[#0B3B2C] font-bold border border-gray-100 shadow-sm relative overflow-hidden' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900 font-medium' }}">
@@ -48,8 +48,7 @@
                 </a>
             </nav>
         </div>
-
-        <div class="p-6">
+        <div class="p-6 hidden md:block">
             <a href="{{ route('admin.register.student') }}" class="w-full bg-[#0B3B2C] hover:bg-[#082a20] text-white text-sm font-bold py-3 rounded-xl transition shadow-md mb-6 flex justify-center items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Register Student
             </a>
@@ -67,45 +66,97 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         
-        <header class="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0 z-10">
-            <h2 class="text-lg font-bold text-gray-900">Kelola Data Pendaftar</h2>
+        <!-- HEADER & MOBILE NAVBAR -->
+        <header class="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 flex-shrink-0 z-20 relative">
+            <h2 class="text-lg font-bold text-gray-900 truncate">Kelola Data Pendaftar</h2>
             
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 md:gap-6">
+                <!-- Search bar (Hidden di Mobile, kita sediakan pencarian khusus di tabel bawah) -->
                 <form action="{{ route('admin.applicants') }}" method="GET" class="relative w-72 hidden md:block">
                     @if(request('status')) <input type="hidden" name="status" value="{{ request('status') }}"> @endif
                     @if(request('sort_date')) <input type="hidden" name="sort_date" value="{{ request('sort_date') }}"> @endif
-
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                     <input type="text" name="search" value="{{ request('search') }}" class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl focus:bg-white focus:border-emerald-200 focus:ring-0 text-sm transition" placeholder="Cari nama atau kota...">
                 </form>
-
-                <div class="flex items-center gap-3 text-gray-400 border-r border-gray-200 pr-6">
+                
+                <div class="flex items-center gap-3 text-gray-400 md:border-r md:border-gray-200 md:pr-6">
                     <a href="{{ route('admin.notifications') }}" class="hover:text-emerald-600 transition relative block p-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                     </a>
-                    <a href="{{ route('admin.settings') }}" class="hover:text-emerald-600 transition block p-2">
+                    <a href="{{ route('admin.settings') }}" class="hover:text-emerald-600 transition hidden sm:block p-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </a>
                 </div>
-
-                <div class="flex items-center gap-3">
+                
+                <div class="flex items-center gap-2 md:gap-3">
                     <div class="text-right hidden md:block">
-                        <p class="text-xs font-bold text-gray-900">{{ Auth::user()->name }}</p>
+                        <p class="text-xs font-bold text-gray-900">{{ Auth::user()->name ?? 'Admin Administrator' }}</p>
                         <p class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Super Administrator</p>
                     </div>
-                    <div class="w-9 h-9 rounded-full bg-[#0B3B2C] border-2 border-emerald-100 overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0B3B2C&color=fff" alt="Admin">
+                    <div class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#0B3B2C] border-2 border-emerald-100 overflow-hidden">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=0B3B2C&color=fff" alt="Admin">
                     </div>
+                    
+                    <!-- Burger Button -->
+                    <button id="mobile-menu-btn" class="md:hidden text-gray-600 focus:outline-none ml-1 p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
                 </div>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8 relative z-0">
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-20 left-0 right-0 bg-white border-b border-gray-200 shadow-xl z-50 overflow-y-auto max-h-[calc(100vh-5rem)]">
+            <div class="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#0B3B2C] rounded-lg flex items-center justify-center text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-gray-900 leading-tight">Madrasah Admin</h1>
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Admission 2026/27</p>
+                </div>
+            </div>
+            
+            <nav class="p-4 space-y-1">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg> Statistics
+                </a>
+                <a href="{{ route('admin.applicants') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-gray-100 text-[#0B3B2C] border border-gray-200">
+                    <svg class="w-5 h-5 text-[#0B3B2C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Applicants
+                </a>
+                <a href="{{ route('admin.verification') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Verification
+                </a>
+                <a href="{{ route('admin.selection') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> Selection
+                </a>
+                <a href="{{ route('admin.reports') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"></path></svg> Reports
+                </a>
+
+                <div class="my-4 border-t border-gray-100"></div>
+
+                <a href="{{ route('admin.register.student') }}" class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-bold bg-[#0B3B2C] text-white shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Register Student
+                </a>
+                <a href="{{ route('admin.help') }}" class="flex items-center gap-3 px-4 py-3 mt-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Help Center
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 text-left">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Logout
+                    </button>
+                </form>
+            </nav>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-8 relative z-0">
             <div class="max-w-7xl mx-auto">
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -130,7 +181,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="flex flex-col gap-6">
                         <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center justify-between flex-1">
                             <div>
@@ -141,7 +191,6 @@
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                         </div>
-
                         <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center justify-between flex-1 relative overflow-hidden">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500"></div>
                             <div class="pl-2">
@@ -156,23 +205,33 @@
                 </div>
 
                 <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden mb-8 relative z-0">
-                    <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="p-6 border-b border-gray-100 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                         
-                        <form action="{{ route('admin.applicants') }}" method="GET" class="flex gap-3 relative z-10">
-                            @if(request('search')) <input type="hidden" name="search" value="{{ request('search') }}"> @endif
-                            
-                            <select name="status" onchange="this.form.submit()" class="px-4 py-2 bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-100 transition focus:ring-0 cursor-pointer">
+                        <!-- Form Pencarian & Filter Disatukan -->
+                        <form action="{{ route('admin.applicants') }}" method="GET" class="flex flex-col sm:flex-row gap-3 relative z-10 w-full lg:w-auto">
+                            <!-- Input Pencarian yang Ditambahkan -->
+                            <div class="relative w-full sm:w-64">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <input type="text" name="search" value="{{ request('search') }}" class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-100 transition focus:bg-white focus:border-emerald-500 focus:ring-0" placeholder="Cari nama atau kota...">
+                            </div>
+
+                            <select name="status" onchange="this.form.submit()" class="w-full sm:w-auto px-4 py-2 bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-100 transition focus:ring-0 cursor-pointer">
                                 <option value="">Semua Status</option>
                                 <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Pending (Menunggu)</option>
                                 <option value="diverifikasi" {{ request('status') == 'diverifikasi' ? 'selected' : '' }}>Verified (Lengkap)</option>
                                 <option value="lulus" {{ request('status') == 'lulus' ? 'selected' : '' }}>Lulus Seleksi</option>
                                 <option value="tidak lulus" {{ request('status') == 'tidak lulus' ? 'selected' : '' }}>Tidak Lulus</option>
                             </select>
-
-                            <select name="sort_date" onchange="this.form.submit()" class="px-4 py-2 bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-100 transition focus:ring-0 cursor-pointer">
+                            <select name="sort_date" onchange="this.form.submit()" class="w-full sm:w-auto px-4 py-2 bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-100 transition focus:ring-0 cursor-pointer">
                                 <option value="desc" {{ request('sort_date') == 'desc' ? 'selected' : '' }}>Pendaftar Terbaru</option>
                                 <option value="asc" {{ request('sort_date') == 'asc' ? 'selected' : '' }}>Pendaftar Terlama</option>
                             </select>
+
+                            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-[#0B3B2C] text-white rounded-xl text-sm font-bold hover:bg-[#082a20] transition shadow-sm">
+                                Cari
+                            </button>
                         </form>
 
                         <div class="text-xs text-gray-500 font-medium">
@@ -245,7 +304,6 @@
                             </tbody>
                         </table>
                     </div>
-
                     <div class="p-6 border-t border-gray-100">
                         {{ $pendaftars->links('pagination::tailwind') }}
                     </div>
@@ -254,10 +312,29 @@
                 <footer class="text-center text-[10px] text-gray-400 font-medium pb-8 uppercase tracking-widest">
                     Sistem Manajemen Terpadu PPTQ Bustanul Wildan © 2026
                 </footer>
-
             </div>
         </div>
     </main>
 
+    <!-- SCRIPT TOGGLE MENU MOBILE ADMIN -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if(menuBtn && mobileMenu && menuIcon) {
+                menuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        menuIcon.setAttribute('d', 'M4 6h16M4 12h16m-7 6h7');
+                    } else {
+                        // Mengubah icon burger menjadi silang (X)
+                        menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

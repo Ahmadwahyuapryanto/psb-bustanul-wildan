@@ -10,23 +10,114 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-figtree min-h-screen flex flex-col">
 
-    <header class="bg-[#0B3B2C] text-white py-4 px-6 md:px-8 flex justify-between items-center shadow-md z-10">
-        <div class="flex items-center gap-3">
-            <div class="bg-amber-500 p-1.5 rounded-lg">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L15 9H22L16.5 14L18.5 21L12 17L5.5 21L7.5 14L2 9H9L12 2Z"></path></svg>
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-[#0B3B2C] text-white py-4 px-6 md:px-8 shadow-md z-30 relative">
+        <div class="flex justify-between items-center max-w-[1440px] mx-auto">
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-500 p-1.5 rounded-lg flex-shrink-0">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L15 9H22L16.5 14L18.5 21L12 17L5.5 21L7.5 14L2 9H9L12 2Z"></path></svg>
+                </div>
+                <span class="font-bold text-base sm:text-lg tracking-wide truncate">PPTQ Bustanul Wildan</span>
             </div>
-            <span class="font-bold text-lg tracking-wide">PPTQ Bustanul Wildan</span>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex space-x-6 text-sm font-medium text-emerald-100">
+                <a href="{{ route('dashboard') }}" class="hover:text-white transition">Dashboard</a>
+                <a href="#" class="text-amber-400 border-b-2 border-amber-400 pb-1 font-bold">Pendaftaran</a>
+                <a href="#" class="hover:text-white transition">Pembayaran</a>
+                <a href="#" class="hover:text-white transition">Bantuan</a>
+            </nav>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-4">
+                    <button class="text-emerald-100 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg></button>
+                    <div class="w-8 h-8 rounded-full bg-emerald-700 overflow-hidden border border-emerald-500">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=047857&color=fff" alt="Profile">
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Button (Burger) -->
+                <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
         </div>
-        <div class="flex items-center gap-4">
-            <div class="w-8 h-8 rounded-full bg-emerald-700 overflow-hidden border border-emerald-500">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=047857&color=fff" alt="Profile">
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 bg-[#0B3B2C] border-t border-emerald-800 shadow-xl z-20">
+            <div class="flex flex-col p-4 space-y-3 font-medium">
+                <a href="{{ route('dashboard') }}" class="py-2 px-4 hover:bg-emerald-800 rounded-lg">Dashboard</a>
+                
+                <!-- Dropdown Pendaftaran di Mobile -->
+                <div class="flex flex-col">
+                    <button id="mobile-step-toggle" class="flex justify-between items-center py-2 px-4 bg-emerald-800 text-amber-400 rounded-lg font-bold">
+                        Pendaftaran
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="mobile-steps-content" class="hidden bg-emerald-900/50 rounded-b-lg flex flex-col mt-1 overflow-hidden">
+                        <a href="{{ route('pendaftaran.step1') }}" class="py-3 px-8 text-emerald-300 text-sm hover:text-white transition">1. Data Pribadi</a>
+                        <a href="{{ route('pendaftaran.step2') }}" class="py-3 px-8 text-emerald-300 text-sm hover:text-white transition">2. Data Orang Tua</a>
+                        <a href="{{ route('pendaftaran.step3') }}" class="py-3 px-8 text-emerald-300 text-sm hover:text-white transition">3. Riwayat Pendidikan</a>
+                        <a href="{{ route('pendaftaran.step4') }}" class="py-3 px-8 text-emerald-300 text-sm hover:text-white transition">4. Dokumen</a>
+                        <a href="#" class="py-3 px-8 text-white bg-emerald-700 text-sm border-l-4 border-amber-500">5. Finalisasi</a>
+                    </div>
+                </div>
+
+                <a href="#" class="py-2 px-4 hover:bg-emerald-800 rounded-lg">Pembayaran</a>
+                <a href="#" class="py-2 px-4 hover:bg-emerald-800 rounded-lg">Bantuan</a>
             </div>
         </div>
     </header>
+    <!-- MOBILE DROPDOWN (Sidebar versi HP) -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200 shadow-md relative z-20 w-full">
+        <div class="p-5">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                <div class="bg-[#0B3B2C] p-2 rounded-lg text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-[#0B3B2C] text-sm">Penerimaan 2026</h3>
+                    <p class="text-[10px] text-gray-500 font-semibold uppercase">Langkah 5 dari 5</p>
+                </div>
+            </div>
 
-    <div class="flex flex-1 overflow-hidden">
-        
-        <aside class="w-72 bg-white border-r border-gray-200 p-6 hidden md:block overflow-y-auto">
+            <div class="w-full bg-gray-200 h-1 rounded-full mb-5">
+                <div class="bg-amber-500 h-1 rounded-full w-full"></div>
+            </div>
+
+            <nav class="space-y-1">
+                <a href="{{ route('pendaftaran.step1') }}" class="flex items-center gap-3 px-4 py-2.5 text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold transition border border-transparent text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Data Pribadi
+                </a>
+                <a href="{{ route('pendaftaran.step2') }}" class="flex items-center gap-3 px-4 py-2.5 text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold transition border border-transparent text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Data Orang Tua
+                </a>
+                <a href="{{ route('pendaftaran.step3') }}" class="flex items-center gap-3 px-4 py-2.5 text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold transition border border-transparent text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Riwayat Pendidikan
+                </a>
+                <a href="{{ route('pendaftaran.step4') }}" class="flex items-center gap-3 px-4 py-2.5 text-emerald-700 hover:bg-emerald-50 rounded-xl font-bold transition border border-transparent text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Dokumen
+                </a>
+                
+                <a href="#" class="flex items-center gap-3 px-4 py-2.5 bg-gray-50 text-[#0B3B2C] rounded-xl font-bold transition border border-gray-100 shadow-sm relative overflow-hidden text-sm">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#0B3B2C]"></div>
+                    <svg class="w-4 h-4 text-[#0B3B2C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Finalisasi
+                </a>
+            </nav>
+
+            <div class="mt-6">
+                <!-- Tombol duplikat yang memicu form asli -->
+                <button type="button" onclick="document.getElementById('form-finalisasi').submit();" class="w-full bg-[#0B3B2C] text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-[#082a20] transition shadow-md flex justify-center items-center gap-2">
+                    Kirim Pendaftaran
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WRAPPER KONTEN UTAMA -->
+    <div class="flex flex-1 overflow-hidden relative">
+        <!-- SIDEBAR DEKSTOP -->
+        <aside class="w-72 bg-white border-r border-gray-200 p-6 hidden md:block overflow-y-auto z-10 relative">
             <div class="flex items-center gap-3 mb-8 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
                 <div class="bg-[#0B3B2C] p-2 rounded-lg text-white">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
@@ -68,7 +159,8 @@
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-6 md:p-10">
+        <!-- KONTEN UTAMA FORM -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-10 relative z-10">
             <div class="max-w-4xl mx-auto">
                 
                 <div class="mb-8">
@@ -99,19 +191,19 @@
                         </div>
 
                         <div class="grid grid-cols-2 gap-y-6 gap-x-4">
-                            <div>
+                            <div class="col-span-2 sm:col-span-1">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nama Lengkap</p>
-                                <p class="text-sm font-semibold text-gray-900">{{ $santri->nama_lengkap }}</p>
+                                <p class="text-sm font-semibold text-gray-900 break-words">{{ $santri->nama_lengkap }}</p>
                             </div>
-                            <div>
+                            <div class="col-span-2 sm:col-span-1">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">NIK</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $santri->nik }}</p>
                             </div>
-                            <div>
+                            <div class="col-span-2 sm:col-span-1">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Tempat, Tgl Lahir</p>
-                                <p class="text-sm font-semibold text-gray-900">{{ $santri->tempat_lahir }}, {{ \Carbon\Carbon::parse($santri->tanggal_lahir)->isoFormat('D MMMM YYYY') }}</p>
+                                <p class="text-sm font-semibold text-gray-900 break-words">{{ $santri->tempat_lahir }}, {{ \Carbon\Carbon::parse($santri->tanggal_lahir)->isoFormat('D MMMM YYYY') }}</p>
                             </div>
-                            <div>
+                            <div class="col-span-2 sm:col-span-1">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Jenis Kelamin</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $santri->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
                             </div>
@@ -176,20 +268,20 @@
                         </div>
                         <ul class="space-y-3">
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 {{ isset($berkas_terunggah['kartu_keluarga']) ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span class="text-xs {{ isset($berkas_terunggah['kartu_keluarga']) ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Kartu Keluarga (KK)</span>
+                                <svg class="w-4 h-4 flex-shrink-0 {{ isset($berkas_terunggah['kartu_keluarga']) ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="text-xs truncate {{ isset($berkas_terunggah['kartu_keluarga']) ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Kartu Keluarga (KK)</span>
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 {{ isset($berkas_terunggah['akta_kelahiran']) ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span class="text-xs {{ isset($berkas_terunggah['akta_kelahiran']) ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Akta Kelahiran</span>
+                                <svg class="w-4 h-4 flex-shrink-0 {{ isset($berkas_terunggah['akta_kelahiran']) ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="text-xs truncate {{ isset($berkas_terunggah['akta_kelahiran']) ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Akta Kelahiran</span>
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 {{ isset($berkas_terunggah['ijazah']) ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span class="text-xs {{ isset($berkas_terunggah['ijazah']) ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Ijazah / SKL</span>
+                                <svg class="w-4 h-4 flex-shrink-0 {{ isset($berkas_terunggah['ijazah']) ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="text-xs truncate {{ isset($berkas_terunggah['ijazah']) ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Ijazah / SKL</span>
                             </li>
                             <li class="flex items-center gap-2">
-                                <svg class="w-4 h-4 {{ $santri->pas_foto ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span class="text-xs {{ $santri->pas_foto ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Pas Foto</span>
+                                <svg class="w-4 h-4 flex-shrink-0 {{ $santri->pas_foto ? 'text-emerald-500' : 'text-gray-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="text-xs truncate {{ $santri->pas_foto ? 'text-gray-700 font-medium' : 'text-gray-400' }}">Pas Foto</span>
                             </li>
                         </ul>
                     </div>
@@ -199,7 +291,7 @@
                     @csrf
                     
                     <div class="bg-gray-100 rounded-3xl p-6 md:p-8 flex items-start gap-4 mb-8">
-                        <div class="pt-1">
+                        <div class="pt-1 flex-shrink-0">
                             <input type="checkbox" name="pernyataan" id="pernyataan" value="1" class="w-5 h-5 text-[#0B3B2C] bg-white border-gray-300 rounded focus:ring-[#0B3B2C] cursor-pointer">
                         </div>
                         <label for="pernyataan" class="text-sm text-gray-700 leading-relaxed cursor-pointer select-none">
@@ -208,13 +300,13 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-gray-200 pt-6">
-                        <a href="{{ route('pendaftaran.step4') }}" class="text-gray-700 font-bold text-sm flex items-center gap-2 bg-white border border-gray-200 px-6 py-3 rounded-xl shadow-sm hover:bg-gray-50 transition w-full sm:w-auto justify-center">
+                        <a href="{{ route('pendaftaran.step4') }}" class="text-gray-700 font-bold text-sm flex items-center justify-center gap-2 bg-white border border-gray-200 px-6 py-3.5 rounded-xl shadow-sm hover:bg-gray-50 transition w-full sm:w-auto">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                             Kembali
                         </a>
                         
-                        <button type="submit" id="btn-submit" disabled class="bg-[#0B3B2C] text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-[#082a20] transition shadow-md flex items-center gap-2 w-full sm:w-auto justify-center disabled:opacity-50 disabled:cursor-not-allowed">
-                            Finalisasi & Kirim Pendaftaran
+                        <button type="submit" id="btn-submit" disabled class="bg-[#0B3B2C] text-white px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-[#082a20] transition shadow-md flex items-center justify-center gap-2 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">
+                            Finalisasi & Kirim
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         </button>
                     </div>
@@ -228,18 +320,48 @@
         </main>
     </div>
 
+    <!-- SCRIPT GABUNGAN: CHECKBOX & DROPDOWN MENU -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 1. Logika Checkbox Finalisasi (Asli)
             const checkbox = document.getElementById('pernyataan');
             const submitBtn = document.getElementById('btn-submit');
 
-            checkbox.addEventListener('change', function() {
-                if(this.checked) {
-                    submitBtn.removeAttribute('disabled');
-                } else {
-                    submitBtn.setAttribute('disabled', 'disabled');
-                }
-            });
+            if(checkbox && submitBtn) {
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        submitBtn.removeAttribute('disabled');
+                    } else {
+                        submitBtn.setAttribute('disabled', 'disabled');
+                    }
+                });
+            }
+
+            // 2. Toggle Navigasi Utama (Burger Menu Baru)
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if(menuBtn && mobileMenu && menuIcon) {
+                menuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        menuIcon.setAttribute('d', 'M4 6h16M4 12h16m-7 6h7');
+                    } else {
+                        menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+                    }
+                });
+            }
+
+            // 3. Toggle Dropdown Step Pendaftaran di Mobile
+            const stepToggle = document.getElementById('mobile-step-toggle');
+            const stepsContent = document.getElementById('mobile-steps-content');
+
+            if(stepToggle && stepsContent) {
+                stepToggle.addEventListener('click', () => {
+                    stepsContent.classList.toggle('hidden');
+                });
+            }
         });
     </script>
 

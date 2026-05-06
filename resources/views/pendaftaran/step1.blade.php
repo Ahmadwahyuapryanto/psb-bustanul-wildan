@@ -10,29 +10,66 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-figtree min-h-screen flex flex-col">
 
-    <header class="bg-[#0B3B2C] text-white py-4 px-6 md:px-8 flex justify-between items-center shadow-md z-10">
+    <header class="bg-[#0B3B2C] text-white py-4 px-6 md:px-8 shadow-md z-30 relative">
+    <div class="flex justify-between items-center max-w-[1440px] mx-auto">
         <div class="flex items-center gap-3">
             <div class="bg-amber-500 p-1.5 rounded-lg">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L15 9H22L16.5 14L18.5 21L12 17L5.5 21L7.5 14L2 9H9L12 2Z"></path></svg>
             </div>
             <span class="font-bold text-lg tracking-wide">PPTQ Bustanul Wildan</span>
         </div>
+
+        <!-- Desktop Nav -->
         <nav class="hidden md:flex space-x-6 text-sm font-medium text-emerald-100">
             <a href="{{ route('dashboard') }}" class="hover:text-white transition">Dashboard</a>
             <a href="#" class="text-amber-400 border-b-2 border-amber-400 pb-1 font-bold">Pendaftaran</a>
-            <a href="#" class="hover:text-white transition">Pembayaran</a>
-            <a href="#" class="hover:text-white transition">Bantuan</a>
+            <a href="{{ route('profile.edit') }}" class="hover:text-white transition">Profil Saya</a>
+            <a href="{{ route('wali.bantuan') }}" class="hover:text-white transition">Bantuan</a>
         </nav>
-        <div class="flex items-center gap-4">
-            <button class="text-emerald-100 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg></button>
-            <button class="text-emerald-100 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
-            <div class="w-8 h-8 rounded-full bg-emerald-700 overflow-hidden border border-emerald-500">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=047857&color=fff" alt="Profile">
-            </div>
-        </div>
-    </header>
 
-    <div class="flex flex-1 overflow-hidden">
+        <div class="flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-4">
+                <button class="text-emerald-100 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg></button>
+                <div class="w-8 h-8 rounded-full bg-emerald-700 overflow-hidden border border-emerald-500">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=047857&color=fff" alt="Profile">
+                </div>
+            </div>
+            
+            <!-- Mobile Menu Button (Burger) -->
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 bg-[#0B3B2C] border-t border-emerald-800 shadow-xl z-20">
+        <div class="flex flex-col p-4 space-y-3 font-medium">
+            <a href="{{ route('dashboard') }}" class="py-2 px-4 hover:bg-emerald-800 rounded-lg">Dashboard</a>
+            
+            <!-- Dropdown Pendaftaran di Mobile -->
+            <div class="flex flex-col">
+                <button id="mobile-step-toggle" class="flex justify-between items-center py-2 px-4 bg-emerald-800 text-amber-400 rounded-lg font-bold">
+                    Pendaftaran
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="mobile-steps-content" class="hidden bg-emerald-900/50 rounded-b-lg flex flex-col mt-1 overflow-hidden">
+                    <!-- Isian Sidebar pindah ke sini saat mobile -->
+                    <a href="#" class="py-3 px-8 text-white bg-emerald-700 text-sm border-l-4 border-amber-500">1. Data Pribadi</a>
+                    <a href="#" class="py-3 px-8 text-emerald-300 text-sm opacity-60">2. Data Orang Tua</a>
+                    <a href="#" class="py-3 px-8 text-emerald-300 text-sm opacity-60">3. Riwayat Pendidikan</a>
+                    <a href="#" class="py-3 px-8 text-emerald-300 text-sm opacity-60">4. Dokumen</a>
+                    <a href="#" class="py-3 px-8 text-emerald-300 text-sm opacity-60">5. Finalisasi</a>
+                </div>
+            </div>
+
+            <a href="{{ route('profile.edit') }}" class="py-2 px-4 hover:bg-emerald-800 rounded-lg">Profil saya</a>
+            <a href="{{ route('wali.bantuan') }}" class="py-2 px-4 hover:bg-emerald-800 rounded-lg">Bantuan</a>
+        </div>
+    </div>
+</header>
+
+    <div class="flex flex-1 overflow-hidden relative">
         <aside class="w-72 bg-white border-r border-gray-200 p-6 hidden md:block overflow-y-auto">
             <div class="flex items-center gap-3 mb-8 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
                 <div class="bg-[#0B3B2C] p-2 rounded-lg text-white">
@@ -79,7 +116,7 @@
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-6 md:p-10">
+        <main class="flex-1 overflow-y-auto p-4 md:p-10">
             <div class="max-w-5xl mx-auto">
                 
                 <div class="mb-8">
@@ -276,6 +313,29 @@
     provinsiSelect.addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         const provinceId = selectedOption.dataset.id;
+      
+        // Toggle Navigasi Utama (Burger Menu)
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            // Ganti icon burger ke close (X) jika diinginkan
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.setAttribute('d', 'M4 6h16M4 12h16m-7 6h7');
+            } else {
+                menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+            }
+        });
+
+        // Toggle Dropdown Step Pendaftaran di Mobile
+        const stepToggle = document.getElementById('mobile-step-toggle');
+        const stepsContent = document.getElementById('mobile-steps-content');
+
+        stepToggle.addEventListener('click', () => {
+            stepsContent.classList.toggle('hidden');
+        });
 
         kabupatenSelect.innerHTML = '<option value="" disabled selected>Memuat...</option>';
 

@@ -8,14 +8,39 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#F8FAFC] text-gray-800 font-figtree flex h-screen overflow-hidden">
+<!-- Mengubah flex bawaan menjadi flex-col untuk HP dan md:flex-row untuk PC -->
+<body class="bg-[#F8FAFC] text-gray-800 font-figtree flex flex-col md:flex-row h-screen overflow-hidden">
 
-    <!-- SIDEBAR (Sama dengan Dashboard) -->
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full z-20">
+    <!-- HEADER MOBILE (Hanya Muncul di Layar HP) -->
+    <div class="md:hidden bg-white border-b border-gray-200 flex justify-between items-center px-6 py-4 flex-shrink-0 z-20 shadow-sm relative">
         <div>
-            <div class="px-8 py-8">
+            <h1 class="text-lg font-bold text-[#0B3B2C]">Bustanul Wildan</h1>
+            <p class="text-[9px] font-semibold text-gray-400 tracking-widest uppercase mt-0.5">Pusat Bantuan</p>
+        </div>
+        <button id="mobile-menu-button" class="text-gray-600 hover:text-[#0B3B2C] focus:outline-none bg-gray-50 p-2 rounded-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- OVERLAY GELAP (Muncul di HP saat menu samping terbuka) -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-30 hidden md:hidden transition-opacity"></div>
+
+    <!-- SIDEBAR / MENU SAMPING -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-300 ease-in-out w-64 bg-white border-r border-gray-200 flex flex-col justify-between flex-shrink-0 h-full z-40">
+        <div>
+            <!-- Menyembunyikan judul di HP karena sudah ada di Header Mobile -->
+            <div class="hidden md:block px-8 py-8">
                 <h1 class="text-xl font-bold text-[#0B3B2C]">Bustanul Wildan</h1>
                 <p class="text-[10px] font-semibold text-gray-400 tracking-widest mt-1 uppercase">Tahun Akademik 2025/2026</p>
+            </div>
+
+            <!-- Tambahan tombol silang khusus di menu HP untuk menutup menu -->
+            <div class="md:hidden flex justify-end px-6 py-4 border-b border-gray-100 mb-4">
+                <button id="close-sidebar-button" class="text-gray-400 hover:text-red-500 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
 
             <nav class="px-4 space-y-2">
@@ -27,7 +52,7 @@
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Pendaftaran Saya
                 </a>
-                <!-- Link Profil (Baru) -->
+                <!-- Link Profil -->
                 <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-[#0B3B2C] rounded-xl text-sm font-semibold transition">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     Profil Saya
@@ -52,16 +77,16 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-[#0B3B2C] text-white flex items-center justify-center font-bold text-lg">
+                <div class="w-10 h-10 rounded-full bg-[#0B3B2C] text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
                     {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                 </div>
-                <div class="flex-1">
-                    <p class="text-sm font-bold text-gray-900 leading-none mb-1">{{ explode(' ', Auth::user()->name ?? 'User')[0] }}</p>
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-bold text-gray-900 leading-none mb-1 truncate">{{ explode(' ', Auth::user()->name ?? 'User')[0] }}</p>
                     <p class="text-[10px] text-gray-500">Akun Wali</p>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="text-gray-400 hover:text-red-500 transition" title="Keluar">
+                    <button type="submit" class="text-gray-400 hover:text-red-500 transition p-1" title="Keluar">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </form>
@@ -70,7 +95,7 @@
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 overflow-y-auto">
+    <main class="flex-1 overflow-y-auto w-full relative z-10">
         <div class="p-8 md:p-12 max-w-5xl mx-auto h-full flex flex-col relative">
             
             <div class="mb-10">
@@ -121,7 +146,7 @@
                 </div>
             </div>
 
-            <footer class="mt-auto pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+            <footer class="mt-auto pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 text-center md:text-left gap-4 md:gap-0">
                 <p>© 2026 PPTQ Bustanul Wildan. Dibuat untuk Kesempurnaan.</p>
                 <div class="flex gap-4 mt-2 md:mt-0">
                     <a href="#" class="hover:text-gray-900 transition">Kebijakan Privasi</a>
@@ -131,5 +156,25 @@
         </div>
     </main>
 
+    <!-- SCRIPT KONTROL SIDEBAR MOBILE -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const openBtn = document.getElementById('mobile-menu-button');
+            const closeBtn = document.getElementById('close-sidebar-button');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            // Fungsi untuk membuka / menutup sidebar
+            function toggleSidebar() {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+
+            // Memasang event listener ke tombol dan overlay
+            if(openBtn) openBtn.addEventListener('click', toggleSidebar);
+            if(closeBtn) closeBtn.addEventListener('click', toggleSidebar);
+            if(overlay) overlay.addEventListener('click', toggleSidebar);
+        });
+    </script>
 </body>
 </html>

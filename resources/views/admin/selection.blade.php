@@ -10,7 +10,7 @@
 <body class="bg-[#F8FAFC] text-gray-800 font-figtree flex h-screen overflow-hidden">
 
     <!-- ... (Sidebar dan Header tetap sama seperti sebelumnya) ... -->
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col justify-between flex-shrink-0 h-full z-20">
+    <aside class="w-64 bg-white border-r border-gray-100 hidden md:flex flex-col justify-between flex-shrink-0 h-full z-20">
         <div>
             <div class="px-8 py-6 flex items-center gap-3 mb-4">
                 <div class="w-8 h-8 bg-[#0B3B2C] rounded-lg flex items-center justify-center text-white">
@@ -54,11 +54,12 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-[#F4F9F7]">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-[#F4F9F7] relative">
         
-        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0 z-10">
+        <!-- HEADER & MOBILE NAVBAR -->
+        <header class="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 md:px-8 flex-shrink-0 z-20 relative">
             <div class="flex items-center gap-8">
-                <h2 class="text-xl font-bold text-[#0B3B2C]">Penentuan Status</h2>
+                <h2 class="text-xl font-bold text-[#0B3B2C] truncate">Penentuan Status</h2>
                 
                 <nav class="hidden md:flex gap-6 pt-1">
                     <a href="{{ route('admin.selection', ['tab' => 'selection']) }}" class="{{ $tab == 'selection' ? 'text-[#0B3B2C] font-bold border-b-2 border-[#8C6B14]' : 'text-gray-400 hover:text-gray-600 font-medium' }} pb-1 text-sm transition">Selection</a>
@@ -67,7 +68,8 @@
                 </nav>
             </div>
             
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 md:gap-6">
+                <!-- Search bar (Hidden di Mobile) -->
                 <form action="{{ route('admin.selection') }}" method="GET" class="relative w-64 hidden md:block">
                     <input type="hidden" name="tab" value="{{ $tab }}">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -76,20 +78,75 @@
                     <input type="text" name="search" value="{{ request('search') }}" class="w-full pl-10 pr-4 py-2 bg-gray-100 border-transparent rounded-full focus:bg-white focus:border-emerald-200 focus:ring-0 text-sm transition" placeholder="Search applicants...">
                 </form>
 
-                <div class="flex items-center gap-4 text-gray-400 border-r border-gray-200 pr-6">
+                <div class="flex items-center gap-4 text-gray-400 md:border-r md:border-gray-200 md:pr-6">
                     <a href="{{ route('admin.notifications') }}" class="hover:text-[#0B3B2C] transition block p-2 relative">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
                     </a>
-                    <a href="{{ route('admin.settings') }}" class="hover:text-[#0B3B2C] transition block p-2">
+                    <a href="{{ route('admin.settings') }}" class="hover:text-[#0B3B2C] transition hidden sm:block p-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </a>
-                    <div class="w-8 h-8 rounded-full bg-[#0B3B2C] overflow-hidden ml-2">
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-[#0B3B2C] overflow-hidden ml-1 md:ml-2">
                         <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0B3B2C&color=fff" alt="Admin">
                     </div>
+                    
+                    <!-- Burger Button -->
+                    <button id="mobile-menu-btn" class="md:hidden text-gray-600 focus:outline-none ml-1 p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
                 </div>
             </div>
         </header>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-20 left-0 right-0 bg-white border-b border-gray-200 shadow-xl z-50 overflow-y-auto max-h-[calc(100vh-5rem)]">
+            <div class="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#0B3B2C] rounded-lg flex items-center justify-center text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-gray-900 leading-tight">Madrasah Admin</h1>
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Admission 2026/27</p>
+                </div>
+            </div>
+
+            <!-- Tab Seleksi khusus HP -->
+            <div class="flex border-b border-gray-200 bg-gray-50/50">
+                <a href="{{ route('admin.selection', ['tab' => 'selection']) }}" class="flex-1 text-center py-3 text-xs {{ $tab == 'selection' ? 'text-[#0B3B2C] font-bold border-b-2 border-[#8C6B14]' : 'text-gray-500 font-medium' }}">Selection</a>
+                <a href="{{ route('admin.selection', ['tab' => 'waitlist']) }}" class="flex-1 text-center py-3 text-xs {{ $tab == 'waitlist' ? 'text-[#0B3B2C] font-bold border-b-2 border-[#8C6B14]' : 'text-gray-500 font-medium' }}">Waitlist</a>
+                <a href="{{ route('admin.selection', ['tab' => 'finalized']) }}" class="flex-1 text-center py-3 text-xs {{ $tab == 'finalized' ? 'text-[#0B3B2C] font-bold border-b-2 border-[#8C6B14]' : 'text-gray-500 font-medium' }}">Finalized</a>
+            </div>
+            
+            <nav class="p-4 space-y-1">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg> Statistics
+                </a>
+                <a href="{{ route('admin.applicants') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Applicants
+                </a>
+                <a href="{{ route('admin.verification') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Verification
+                </a>
+                <a href="{{ route('admin.selection') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold bg-gray-100 text-[#0B3B2C] border border-gray-200">
+                    <svg class="w-5 h-5 text-[#0B3B2C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> Selection
+                </a>
+                <a href="{{ route('admin.reports') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"></path></svg> Reports
+                </a>
+
+                <div class="my-4 border-t border-gray-100"></div>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 text-left">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Logout
+                    </button>
+                </form>
+            </nav>
+        </div>
 
         <div class="flex-1 overflow-y-auto p-8 relative">
             
@@ -358,6 +415,23 @@
             const modalInner = modal.querySelector('div');
             const btnBatal = document.getElementById('btnBatal');
             const selectedCountSpan = document.getElementById('selectedCount');
+
+            // FUNGSI TOGGLE MENU MOBILE ADMIN
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+
+            if(menuBtn && mobileMenu && menuIcon) {
+                menuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        menuIcon.setAttribute('d', 'M4 6h16M4 12h16m-7 6h7');
+                    } else {
+                        // Mengubah icon burger menjadi silang (X)
+                        menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+                    }
+                });
+            }
 
             // Fungsi untuk memeriksa status checkbox
             function checkStatus() {
