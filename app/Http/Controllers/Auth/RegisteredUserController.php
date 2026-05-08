@@ -30,19 +30,36 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // Langkah 1: Tambahkan 'no_wa' ke dalam daftar validasi
+        // Menambahkan array kedua untuk kustomisasi pesan error
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'no_wa' => ['required', 'string', 'max:20'], // Memastikan no_wa wajib diisi dan maksimal 20 karakter
+            'no_wa' => ['required', 'string', 'max:20'], 
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            // Pesan khusus untuk kolom 'name'
+            'name.required' => 'Mohon isi nama lengkap wali santri ya.',
+            'name.max' => 'Nama lengkap maksimal 255 karakter.',
+            
+            // Pesan khusus untuk kolom 'email'
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format email kurang tepat (contoh: nama@email.com).',
+            'email.unique' => 'Email ini sudah terdaftar. Yuk, coba gunakan email yang lain!',
+            
+            // Pesan khusus untuk kolom 'no_wa'
+            'no_wa.required' => 'Nomor WhatsApp wajib diisi agar kami bisa mengirimkan notifikasi.',
+            'no_wa.max' => 'Nomor WhatsApp terlalu panjang, maksimal 20 digit.',
+            
+            // Pesan khusus untuk kolom 'password'
+            'password.required' => 'Kata sandi wajib diisi untuk keamanan akun.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok, coba ketik ulang ya.',
+            'password.min' => 'Kata sandi setidaknya harus memiliki minimal 8 karakter.',
         ]);
 
-        // Langkah 2: Tambahkan 'no_wa' ke proses pembuatan User ke database
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'no_wa' => $request->no_wa, // Mengambil input WA dan menyimpannya
+            'no_wa' => $request->no_wa, 
             'password' => Hash::make($request->password),
         ]);
 
