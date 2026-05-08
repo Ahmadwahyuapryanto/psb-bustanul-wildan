@@ -92,6 +92,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/applicants', [AdminController::class, 'applicants'])->name('admin.applicants');
         Route::delete('/applicants/{id}', [AdminController::class, 'destroy'])->name('admin.applicants.destroy'); // Rute Hapus Data
         Route::get('/applicants/{id}/download', [AdminController::class, 'downloadDetail'])->name('admin.applicants.download');
+           Route::get('/admin/applicants/{id}/edit', [AdminController::class, 'edit'])->name('admin.applicants.edit');
+Route::put('/admin/applicants/{id}', [AdminController::class, 'update'])->name('admin.applicants.update');
         
         // Laporan & Ekspor Data
         Route::get('/export', [AdminController::class, 'exportData'])->name('admin.export');
@@ -115,6 +117,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/selection/report', [AdminController::class, 'generateSelectionReport'])->name('admin.selection.report');
         Route::post('/selection/blast-wa', [AdminController::class, 'blastWa'])->name('admin.selection.blast');
         Route::post('/selection/schedule', [AdminController::class, 'setSchedule'])->name('admin.selection.schedule');
+     
     });
 
 });

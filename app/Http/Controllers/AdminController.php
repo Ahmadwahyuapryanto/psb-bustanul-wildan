@@ -118,6 +118,68 @@ class AdminController extends Controller
         ));
     }
 
+    public function edit($id)
+{
+    // Mengambil data santri beserta relasi orang tua dan pendidikannya
+    $santri = Santri::with(['orangTua', 'pendidikan'])->findOrFail($id);
+    return view('admin.edit-applicant', compact('santri'));
+}
+
+public function update(Request $request, $id)
+{
+    $santri = Santri::findOrFail($id);
+
+    // Validasi sesuai dengan file PendaftaranController.php
+    $request->validate([
+        // Data Pribadi
+        'nama_lengkap' => 'required|string|max:255',
+        'nik' => 'required|numeric|digits:16',
+        'tempat_lahir' => 'required|string|max:255',
+        'tanggal_lahir' => 'required|date',
+        'jenis_kelamin' => 'required|in:L,P',
+        'alamat' => 'required|string',
+        'provinsi' => 'required|string',
+        'kabupaten' => 'required|string',
+
+        // Data Orang Tua
+        'nama_ayah' => 'required', 'nik_ayah' => 'required|digits:16', 'pendidikan_ayah' => 'required',
+        'pekerjaan_ayah' => 'required', 'penghasilan_ayah' => 'required',
+        'nama_ibu' => 'required', 'nik_ibu' => 'required|digits:16', 'pendidikan_ibu' => 'required',
+        'pekerjaan_ibu' => 'required', 'penghasilan_ibu' => 'required',
+        'no_wa_darurat' => 'required|numeric',
+
+        // Data Pendidikan
+        'nama_sekolah' => 'nullable|string|max:255',
+        'tahun_lulus' => 'nullable|numeric',
+        'alamat_sekolah' => 'nullable|string',
+        'prestasi' => 'nullable|string',
+    ]);
+
+    // Update Data Pribadi
+    $santri->update($request->only([
+        'nama_lengkap', 'nik', 'tempat_lahir', 'tanggal_lahir', 
+        'jenis_kelamin', 'alamat', 'provinsi', 'kabupaten'
+    ]));
+
+    // Update Data Orang Tua
+    if ($santri->orangTua) {
+        $santri->orangTua->update($request->only([
+            'nama_ayah', 'nik_ayah', 'pendidikan_ayah', 'pekerjaan_ayah', 'penghasilan_ayah',
+            'nama_ibu', 'nik_ibu', 'pendidikan_ibu', 'pekerjaan_ibu', 'penghasilan_ibu',
+            'no_wa_darurat'
+        ]));
+    }
+
+    // Update Data Pendidikan
+    if ($santri->pendidikan) {
+        $santri->pendidikan->update($request->only([
+            'nama_sekolah', 'tahun_lulus', 'alamat_sekolah', 'prestasi'
+        ]));
+    }
+
+    return redirect()->route('admin.selection')->with('success', 'Data pendaftar berhasil diperbarui!');
+}
+
     // FUNGSI BARU: Hapus Data Pendaftar (Sesuai Diagram Usecase Kelola Data)
     public function destroy($id)
     {
@@ -240,8 +302,6 @@ class AdminController extends Controller
 
         return redirect()->route('admin.verification')->with('error', 'Berkas atas nama ' . $santri->nama_lengkap . ' telah ditolak.');
     }
-
-    // --- BAGIAN SELEKSI YANG SUDAH DIUPDATE ---
     
     // 1. Menampilkan Halaman Seleksi & Log Notifikasi
     public function selection(Request $request)

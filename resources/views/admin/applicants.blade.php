@@ -253,7 +253,7 @@
                             </thead>
                             <tbody class="text-sm">
                                 @forelse($pendaftars as $index => $santri)
-                                <tr class="border-b border-gray-50 hover:bg-gray-50 transition relative z-0">
+                                <tr class="border-b border-gray-50 hover:bg-gray-50 transition relative z-0 hover:z-50">
                                     <td class="py-4 px-6 text-center text-gray-400 font-medium">
                                         {{ str_pad($pendaftars->firstItem() + $index, 2, '0', STR_PAD_LEFT) }}
                                     </td>
@@ -292,6 +292,15 @@
                                             <div class="absolute right-10 top-0 w-36 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible focus-within:opacity-100 focus-within:visible transition-all z-50 text-left overflow-hidden">
                                                 <a href="{{ route('admin.verification', $santri->id) }}" class="block px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-emerald-50 hover:text-emerald-700">Verifikasi Berkas</a>
                                                 <a href="{{ route('admin.selection') }}?search={{ $santri->id }}" class="block px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-amber-50 hover:text-amber-700">Ubah Status</a>
+                                               <a href="{{ route('admin.applicants.edit', $santri->id) }}" class="block px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-emerald-50 hover:text-blue-700">Edit Data</a> 
+                                               <form action="{{ route('admin.applicants.destroy', $santri->id) }}" method="POST" class="block border-t border-gray-50" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data santri ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="w-full text-left px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 transition flex justify-between items-center">
+                                                        Hapus Data
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </td>

@@ -25,4 +25,16 @@ class Santri extends Model
     {
         return $this->hasMany(Berkas::class);
     }
+    public function orangTua()
+    {
+        return $this->hasOne(OrangTua::class);
+    }
+
+    // ==========================================
+    // TAMBAHAN BARU: Relasi ke tabel Pendidikan
+    // ==========================================
+    public function pendidikan()
+    {
+        return $this->hasOne(Pendidikan::class);
+    }
 }
