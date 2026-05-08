@@ -50,7 +50,7 @@
                     <p class="text-sm text-gray-500">Silakan lengkapi formulir di bawah ini untuk membuat akun.</p>
                 </div>
 
-                <form method="POST" action="{{ route('register') }}">
+                <form method="POST" action="{{ route('register') }}" novalidate>
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
