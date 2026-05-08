@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Santri;
+use App\Models\Notifikasi; // <-- DITAMBAHKAN UNTUK LOG DATABASE
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http; // <-- DITAMBAHKAN UNTUK API FONNTE
 
@@ -17,7 +18,7 @@ class AdminController extends Controller
         $menunggu = Santri::where('status_pendaftaran', 'menunggu')->count();
         
         // Menghitung Sisa Kuota (Sasaran 1500)
-        $targetKuota = 1500;
+        $targetKuota = 100;
         $sisaKuota = $targetKuota - $totalPendaftar;
 
         // 2. Data untuk Grafik dengan Filter (Minggu Ini / Bulan Ini)
@@ -117,6 +118,16 @@ class AdminController extends Controller
         ));
     }
 
+    // FUNGSI BARU: Hapus Data Pendaftar (Sesuai Diagram Usecase Kelola Data)
+    public function destroy($id)
+    {
+        $santri = Santri::findOrFail($id);
+        $nama = $santri->nama_lengkap;
+        $santri->delete();
+
+        return redirect()->route('admin.applicants')->with('success', 'Data pendaftar atas nama ' . $nama . ' berhasil dihapus.');
+    }
+
     // 2. FUNGSI-FUNGSI PENDUKUNG SIDEBAR
     public function settings() {
         return "Ini Halaman Pengaturan Admin (Akan dikembangkan nanti)";
@@ -191,23 +202,25 @@ class AdminController extends Controller
 
     // 2. Pastikan fungsi verification mengirimkan data santri yang lengkap
     public function verification($id = null)
-    {
-        $antrean = Santri::where('status_pendaftaran', 'menunggu')->orderBy('created_at', 'asc')->get();
-        $totalAntrean = $antrean->count();
+{
+    // Tambahkan 'berkas' di dalam with agar data dokumen ikut terbawa ke view
+    $antrean = Santri::with(['berkas'])->where('status_pendaftaran', 'menunggu')->orderBy('created_at', 'asc')->get();
+    $totalAntrean = $antrean->count();
 
-        if ($totalAntrean == 0 && !$id) {
-            return redirect()->route('admin.dashboard')->with('success', 'Semua berkas telah selesai diverifikasi.');
-        }
-
-        $santri = $id ? Santri::with(['user'])->findOrFail($id) : $antrean->first();
-
-        // Navigasi antrean
-        $nextSantri = Santri::where('status_pendaftaran', 'menunggu')->where('id', '>', $santri->id)->orderBy('id', 'asc')->first();
-        $prevSantri = Santri::where('status_pendaftaran', 'menunggu')->where('id', '<', $santri->id)->orderBy('id', 'desc')->first();
-        $posisiSekarang = Santri::where('status_pendaftaran', 'menunggu')->where('id', '<=', $santri->id)->count();
-
-        return view('admin.verification', compact('santri', 'nextSantri', 'prevSantri', 'totalAntrean', 'posisiSekarang'));
+    if ($totalAntrean == 0 && !$id) {
+        return redirect()->route('admin.dashboard')->with('success', 'Semua berkas telah selesai diverifikasi.');
     }
+
+    // Tambahkan 'berkas' di sini juga
+    $santri = $id ? Santri::with(['user', 'berkas'])->findOrFail($id) : $antrean->first();
+
+    // Navigasi antrean tetap sama
+    $nextSantri = Santri::where('status_pendaftaran', 'menunggu')->where('id', '>', $santri->id)->orderBy('id', 'asc')->first();
+    $prevSantri = Santri::where('status_pendaftaran', 'menunggu')->where('id', '<', $santri->id)->orderBy('id', 'desc')->first();
+    $posisiSekarang = Santri::where('status_pendaftaran', 'menunggu')->where('id', '<=', $santri->id)->count();
+
+    return view('admin.verification', compact('santri', 'nextSantri', 'prevSantri', 'totalAntrean', 'posisiSekarang'));
+}
     // Menampilkan halaman verifikasi
 
     // Fungsi Setujui Berkas
@@ -239,7 +252,7 @@ class AdminController extends Controller
         $totalTerverifikasi = Santri::whereIn('status_pendaftaran', ['diverifikasi', 'lulus', 'tidak lulus', 'cadangan'])->count();
         $menungguKeputusan = Santri::where('status_pendaftaran', 'diverifikasi')->count();
         $totalLulus = Santri::where('status_pendaftaran', 'lulus')->count();
-        $kuotaTersisa = 1500 - $totalLulus; // Target kuota 1500
+        $kuotaTersisa = 100 - $totalLulus; // Target kuota 1500
 
         // Logika Filter Tab Menu
         $query = Santri::with('user')->latest();
@@ -331,6 +344,20 @@ class AdminController extends Controller
 
                 if ($response->successful()) {
                     $berhasil++;
+                    // PENCATATAN LOG KE DATABASE
+                    Notifikasi::create([
+                        'santri_id' => $santri->id,
+                        'judul' => 'Pengumuman Kelulusan',
+                        'pesan' => $pesan,
+                        'status' => 'Berhasil'
+                    ]);
+                } else {
+                    Notifikasi::create([
+                        'santri_id' => $santri->id,
+                        'judul' => 'Pengumuman Kelulusan',
+                        'pesan' => $pesan,
+                        'status' => 'Gagal'
+                    ]);
                 }
             }
         }
@@ -412,13 +439,38 @@ class AdminController extends Controller
 
                     // Tangkap pesan gagal langsung dari server Fonnte
                     $responseData = $response->json();
-                    if (!$response->successful() || (isset($responseData['status']) && $responseData['status'] == false)) {
+                    
+                    if ($response->successful() && (isset($responseData['status']) && $responseData['status'] == true)) {
+                        // PENCATATAN LOG KE DATABASE JIKA SUKSES
+                        Notifikasi::create([
+                            'santri_id' => $santri->id,
+                            'judul' => 'Jadwal Tes & Wawancara',
+                            'pesan' => $pesan,
+                            'status' => 'Berhasil'
+                        ]);
+                    } else {
                          $pesanGagal[] = $santri->nama_lengkap . ' (Ditolak API Fonnte: ' . ($responseData['reason'] ?? 'Unknown error') . ')';
+                         
+                         // PENCATATAN LOG KE DATABASE JIKA GAGAL
+                         Notifikasi::create([
+                            'santri_id' => $santri->id,
+                            'judul' => 'Jadwal Tes & Wawancara',
+                            'pesan' => $pesan,
+                            'status' => 'Gagal'
+                        ]);
                     }
 
                 } catch (\Exception $e) {
                     // Tangkap pesan gagal jika internet mati atau server Fonnte down
                     $pesanGagal[] = $santri->nama_lengkap . ' (Koneksi Error: ' . $e->getMessage() . ')';
+                    
+                    // PENCATATAN LOG ERROR KONEKSI
+                    Notifikasi::create([
+                        'santri_id' => $santri->id,
+                        'judul' => 'Jadwal Tes & Wawancara',
+                        'pesan' => $pesan,
+                        'status' => 'Gagal/Error Koneksi'
+                    ]);
                 }
             }
         }

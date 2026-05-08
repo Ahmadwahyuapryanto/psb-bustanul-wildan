@@ -24,8 +24,8 @@
             <nav class="hidden md:flex space-x-6 text-sm font-medium text-emerald-100">
                 <a href="{{ route('dashboard') }}" class="hover:text-white transition">Dashboard</a>
                 <a href="#" class="text-amber-400 border-b-2 border-amber-400 pb-1 font-bold">Pendaftaran</a>
-                <a href="#" class="hover:text-white transition">Pembayaran</a>
-                <a href="#" class="hover:text-white transition">Bantuan</a>
+               <a href="{{ route('profile.edit') }}" class="hover:text-white transition">Profil Saya</a>
+            <a href="{{ route('wali.bantuan') }}" class="hover:text-white transition">Bantuan</a>
             </nav>
 
             <div class="flex items-center gap-4">

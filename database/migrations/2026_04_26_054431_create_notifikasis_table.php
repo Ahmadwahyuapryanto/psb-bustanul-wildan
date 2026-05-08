@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('notifikasis', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade');
+            $table->string('judul');
+            $table->text('pesan');
+            $table->string('status'); // Untuk menyimpan 'Berhasil' atau 'Gagal'
             $table->timestamps();
         });
     }

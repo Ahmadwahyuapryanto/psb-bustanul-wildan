@@ -191,7 +191,7 @@
                         <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
                             <p class="text-[9px] font-bold text-gray-400 tracking-widest uppercase mb-2">Laporan Terkirim</p>
                             <div class="flex items-baseline gap-2">
-                                <h3 class="text-2xl font-bold text-gray-900">892</h3>
+                                <h3 class="text-2xl font-bold text-gray-900">1</h3>
                                 <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             </div>
                         </div>

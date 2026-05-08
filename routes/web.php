@@ -49,7 +49,7 @@ Route::get('/admin/login', function () {
     return view('auth.admin-login');
 })->middleware('guest')->name('admin.login');
 
-// MEMPROSES login Admin (Pindahkan ke sini, di LUAR grup auth)
+// MEMPROSES login Admin
 Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])
     ->middleware('guest');
 
@@ -63,52 +63,58 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    // Pastikan diletakkan di DALAM grup Route::middleware(['auth', 'verified'])
-Route::get('/pendaftaran/step-1', [PendaftaranController::class, 'createStepOne'])->name('pendaftaran.step1');
-Route::post('/pendaftaran/step-1', [PendaftaranController::class, 'storeStepOne'])->name('pendaftaran.step1.store');
-Route::get('/pendaftaran/step-2', [PendaftaranController::class, 'createStepTwo'])->name('pendaftaran.step2');
-Route::post('/pendaftaran/step-2', [PendaftaranController::class, 'storeStepTwo'])->name('pendaftaran.step2.store');
-// Rute Pendaftaran Step 3 (Riwayat Pendidikan)
-Route::get('/pendaftaran/step3', [App\Http\Controllers\PendaftaranController::class, 'createStepThree'])->name('pendaftaran.step3');
-Route::post('/pendaftaran/step3', [App\Http\Controllers\PendaftaranController::class, 'storeStepThree'])->name('pendaftaran.step3.store');
-// Tambahkan di bawah rute step-1 dan step-2 yang sudah ada
-Route::get('/pendaftaran/step-4', [PendaftaranController::class, 'createStepFour'])->name('pendaftaran.step4');
-Route::post('/pendaftaran/step-4', [PendaftaranController::class, 'storeStepFour'])->name('pendaftaran.step4.store');
-Route::get('/pendaftaran/step-5', [PendaftaranController::class, 'createStepFive'])->name('pendaftaran.step5');
-Route::post('/pendaftaran/step-5', [PendaftaranController::class, 'storeStepFive'])->name('pendaftaran.step5.store');
+
+    // Rute Pendaftaran (Langkah 1 - 5)
+    Route::get('/pendaftaran/step-1', [PendaftaranController::class, 'createStepOne'])->name('pendaftaran.step1');
+    Route::post('/pendaftaran/step-1', [PendaftaranController::class, 'storeStepOne'])->name('pendaftaran.step1.store');
+    Route::get('/pendaftaran/step-2', [PendaftaranController::class, 'createStepTwo'])->name('pendaftaran.step2');
+    Route::post('/pendaftaran/step-2', [PendaftaranController::class, 'storeStepTwo'])->name('pendaftaran.step2.store');
+    Route::get('/pendaftaran/step3', [PendaftaranController::class, 'createStepThree'])->name('pendaftaran.step3');
+    Route::post('/pendaftaran/step3', [PendaftaranController::class, 'storeStepThree'])->name('pendaftaran.step3.store');
+    Route::get('/pendaftaran/step-4', [PendaftaranController::class, 'createStepFour'])->name('pendaftaran.step4');
+    Route::post('/pendaftaran/step-4', [PendaftaranController::class, 'storeStepFour'])->name('pendaftaran.step4.store');
+    Route::get('/pendaftaran/step-5', [PendaftaranController::class, 'createStepFive'])->name('pendaftaran.step5');
+    Route::post('/pendaftaran/step-5', [PendaftaranController::class, 'storeStepFive'])->name('pendaftaran.step5.store');
+
     // Dashboard standar untuk Wali Santri
-    // GANTI MENJADI INI
-Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/wali-santri/bantuan', [WaliSantriController::class, 'bantuan'])->name('wali.bantuan');
 
-    // Dashboard khusus Admin (Pakai Controller yang sudah kita buat)
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-    Route::get('/admin/applicants', [App\Http\Controllers\AdminController::class, 'applicants'])->name('admin.applicants');
-   // Tambahkan di bawah rute admin.dashboard dan admin.applicants
-Route::get('/admin/export', [App\Http\Controllers\AdminController::class, 'exportData'])->name('admin.export');
-Route::get('/admin/print', [App\Http\Controllers\AdminController::class, 'cetakLaporan'])->name('admin.print'); 
-// Rute untuk fitur-fitur tambahan Admin
-Route::get('/admin/settings', [App\Http\Controllers\AdminController::class, 'settings'])->name('admin.settings');
-Route::get('/admin/notifications', [App\Http\Controllers\AdminController::class, 'notifications'])->name('admin.notifications');
-Route::get('/admin/help', [App\Http\Controllers\AdminController::class, 'help'])->name('admin.help');
-Route::get('/admin/register-student', [App\Http\Controllers\AdminController::class, 'registerStudent'])->name('admin.register.student');
-// Rute untuk Halaman Verifikasi
-Route::get('/admin/verification/{id?}', [App\Http\Controllers\AdminController::class, 'verification'])->name('admin.verification');
-Route::post('/admin/verification/{id}/approve', [App\Http\Controllers\AdminController::class, 'approveBerkas'])->name('admin.verification.approve');
-Route::post('/admin/verification/{id}/reject', [App\Http\Controllers\AdminController::class, 'rejectBerkas'])->name('admin.verification.reject');
-// Rute untuk Halaman Seleksi & Penentuan Status
-Route::get('/admin/selection', [App\Http\Controllers\AdminController::class, 'selection'])->name('admin.selection');
-Route::post('/admin/selection/{id}/update-status', [App\Http\Controllers\AdminController::class, 'updateSelectionStatus'])->name('admin.selection.update');
-Route::post('/admin/selection/report', [App\Http\Controllers\AdminController::class, 'generateSelectionReport'])->name('admin.selection.report');
-Route::post('/admin/selection/blast-wa', [App\Http\Controllers\AdminController::class, 'blastWa'])->name('admin.selection.blast');
-
-// Tambahkan rute ini di bawah rute admin.selection
-Route::get('/admin/reports', [App\Http\Controllers\AdminController::class, 'reports'])->name('admin.reports');
-
-// Rute untuk download detail santri dalam format PDF/Print
-Route::get('/admin/applicants/{id}/download', [App\Http\Controllers\AdminController::class, 'downloadDetail'])->name('admin.applicants.download');
-Route::post('/admin/selection/schedule', [App\Http\Controllers\AdminController::class, 'setSchedule'])->name('admin.selection.schedule');
-Route::get('/dashboard/wali-santri/bantuan', [WaliSantriController::class, 'bantuan'])->name('wali.bantuan');
+    // -------------------------------------------------------------------------------------------------
+    // RUTE ADMIN (Dikelompokkan agar lebih aman dan rapi sesuai perancangan skripsi)
+    // -------------------------------------------------------------------------------------------------
+    // PERHATIKAN: Saya menambahkan ->middleware('admin') di sini
+    Route::prefix('admin')->middleware('admin')->group(function () {
+        // Dashboard Utama Admin
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+        
+        // Manajemen Pendaftar
+        Route::get('/applicants', [AdminController::class, 'applicants'])->name('admin.applicants');
+        Route::delete('/applicants/{id}', [AdminController::class, 'destroy'])->name('admin.applicants.destroy'); // Rute Hapus Data
+        Route::get('/applicants/{id}/download', [AdminController::class, 'downloadDetail'])->name('admin.applicants.download');
+        
+        // Laporan & Ekspor Data
+        Route::get('/export', [AdminController::class, 'exportData'])->name('admin.export');
+        Route::get('/print', [AdminController::class, 'cetakLaporan'])->name('admin.print'); 
+        Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+        
+        // Fitur Tambahan & Bantuan
+        Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+        Route::get('/notifications', [AdminController::class, 'notifications'])->name('admin.notifications');
+        Route::get('/help', [AdminController::class, 'help'])->name('admin.help');
+        Route::get('/register-student', [AdminController::class, 'registerStudent'])->name('admin.register.student');
+        
+        // Verifikasi Berkas
+        Route::get('/verification/{id?}', [AdminController::class, 'verification'])->name('admin.verification');
+        Route::post('/verification/{id}/approve', [AdminController::class, 'approveBerkas'])->name('admin.verification.approve');
+        Route::post('/verification/{id}/reject', [AdminController::class, 'rejectBerkas'])->name('admin.verification.reject');
+        
+        // Seleksi, Penentuan Status, & Notifikasi
+        Route::get('/selection', [AdminController::class, 'selection'])->name('admin.selection');
+        Route::post('/selection/{id}/update-status', [AdminController::class, 'updateSelectionStatus'])->name('admin.selection.update');
+        Route::post('/selection/report', [AdminController::class, 'generateSelectionReport'])->name('admin.selection.report');
+        Route::post('/selection/blast-wa', [AdminController::class, 'blastWa'])->name('admin.selection.blast');
+        Route::post('/selection/schedule', [AdminController::class, 'setSchedule'])->name('admin.selection.schedule');
+    });
 
 });

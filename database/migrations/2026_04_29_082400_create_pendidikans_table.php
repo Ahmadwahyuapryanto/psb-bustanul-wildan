@@ -9,19 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
- public function up()
+    public function up()
     {
         Schema::create('pendidikans', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('santri_id'); // Relasi ke tabel santri
+            $table->unsignedBigInteger('santri_id'); 
             $table->string('nama_sekolah');
             $table->text('alamat_sekolah');
             $table->year('tahun_lulus');
             $table->text('prestasi')->nullable();
             $table->timestamps();
 
-            // Opsional: Jika tabel santrimu bernama 'santris'
-            // $table->foreign('santri_id')->references('id')->on('santris')->onDelete('cascade');
+            // Mengaktifkan relasi agar saling terhubung kuat (Integritas Data)
+            $table->foreign('santri_id')->references('id')->on('santris')->onDelete('cascade');
         });
     }
 

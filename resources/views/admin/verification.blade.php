@@ -9,7 +9,6 @@
 </head>
 <body class="bg-[#F8FAFC] text-gray-800 font-figtree flex h-screen overflow-hidden">
     
-    <!-- SIDEBAR DEKSTOP -->
     <aside class="w-64 bg-white border-r border-gray-100 hidden md:flex flex-col justify-between flex-shrink-0 h-full z-20">
         <div>
             <div class="px-8 py-6 flex items-center gap-3 mb-4">
@@ -63,7 +62,6 @@
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         
-        <!-- HEADER & MOBILE NAVBAR -->
         <header class="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 flex-shrink-0 z-20 relative">
             <h2 class="text-lg font-bold text-gray-900 truncate">Verifikasi Berkas</h2>
             
@@ -76,14 +74,12 @@
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0B3B2C&color=fff" alt="Admin">
                 </div>
 
-                <!-- Burger Button -->
                 <button id="mobile-menu-btn" class="md:hidden text-gray-600 focus:outline-none ml-1 p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </header>
 
-        <!-- Mobile Menu Overlay -->
         <div id="mobile-menu" class="hidden md:hidden absolute top-20 left-0 right-0 bg-white border-b border-gray-200 shadow-xl z-50 overflow-y-auto max-h-[calc(100vh-5rem)]">
             <div class="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-3">
                 <div class="w-10 h-10 bg-[#0B3B2C] rounded-lg flex items-center justify-center text-white">
@@ -143,33 +139,75 @@
                     </div>
                 @endif
 
+                @php
+                    use Illuminate\Support\Facades\Storage;
+                    
+                    $urlFoto = $santri->pas_foto ? Storage::disk('supabase')->url($santri->pas_foto) : null;
+                    
+                    $urlKK = null;
+                    $urlAkta = null;
+                    $urlIjazah = null;
+
+                    if(isset($santri->berkas)) {
+                        $fileKK = $santri->berkas->where('jenis_berkas', 'kartu_keluarga')->first();
+                        $urlKK = $fileKK ? Storage::disk('supabase')->url($fileKK->file_path) : null;
+
+                        $fileAkta = $santri->berkas->where('jenis_berkas', 'akta_kelahiran')->first();
+                        $urlAkta = $fileAkta ? Storage::disk('supabase')->url($fileAkta->file_path) : null;
+
+                        $fileIjazah = $santri->berkas->where('jenis_berkas', 'ijazah')->first();
+                        $urlIjazah = $fileIjazah ? Storage::disk('supabase')->url($fileIjazah->file_path) : null;
+                    }
+
+                    // Tentukan URL default yang muncul pertama kali (prioritas Foto)
+                    $defaultUrl = $urlFoto ?? $urlKK ?? $urlAkta ?? $urlIjazah;
+                @endphp
+
                 <div class="flex-1 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col overflow-hidden relative h-full min-h-[400px]">
                     
-                    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white z-10">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-amber-50 text-amber-600 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    <div class="p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white z-10 gap-4">
+                        <div class="flex flex-col gap-2 w-full sm:w-auto">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-amber-50 text-amber-600 rounded-lg flex-shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pratinjau Berkas</p>
+                                    <h3 class="text-sm font-bold text-gray-900" id="preview-title">Pas Foto</h3>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pratinjau Berkas</p>
-                                <h3 class="text-sm font-bold text-gray-900">Pas Foto / Akta Kelahiran</h3>
+                            <div class="flex gap-2 mt-1 overflow-x-auto pb-1" id="document-tabs">
+                                @if($urlFoto) 
+                                    <button onclick="changePreview('{{ $urlFoto }}', 'Pas Foto', this)" class="doc-tab active px-3 py-1.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-lg whitespace-nowrap transition">Pas Foto</button> 
+                                @endif
+                                @if($urlKK) 
+                                    <button onclick="changePreview('{{ $urlKK }}', 'Kartu Keluarga', this)" class="doc-tab px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-bold rounded-lg whitespace-nowrap transition">Kartu Keluarga</button> 
+                                @endif
+                                @if($urlAkta) 
+                                    <button onclick="changePreview('{{ $urlAkta }}', 'Akta Kelahiran', this)" class="doc-tab px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-bold rounded-lg whitespace-nowrap transition">Akta Kelahiran</button> 
+                                @endif
+                                @if($urlIjazah) 
+                                    <button onclick="changePreview('{{ $urlIjazah }}', 'Ijazah', this)" class="doc-tab px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-bold rounded-lg whitespace-nowrap transition">Ijazah</button> 
+                                @endif
                             </div>
                         </div>
-                        <div class="flex gap-2">
+
+                        <div class="flex gap-2 flex-shrink-0 self-end sm:self-auto">
                             <button onclick="zoomIn()" class="p-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg transition border border-gray-200">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
                             </button>
                             <button onclick="zoomOut()" class="p-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg transition border border-gray-200">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM7 10h6"></path></svg>
                             </button>
-                            <a href="{{ asset('storage/' . $santri->pas_foto) }}" download="Berkas_{{ $santri->nama_lengkap }}" class="p-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg transition border border-gray-200">
+                            <a id="download-btn" href="{{ $defaultUrl }}" target="_blank" download="Berkas_{{ $santri->nama_lengkap }}" class="p-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg transition border border-gray-200">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             </a>
                         </div>
                     </div>
+
                     <div class="flex-1 bg-gray-50 overflow-auto flex items-center justify-center p-8 relative" id="preview-container">
-                        @if($santri->pas_foto)
-                            <img id="doc-preview" src="{{ asset('storage/' . $santri->pas_foto) }}" alt="Berkas" class="max-w-full shadow-lg rounded border border-gray-200 transition-transform duration-200" style="transform: scale(1);">
+                        @if($defaultUrl)
+                            <img id="doc-preview" src="{{ $defaultUrl }}" alt="Berkas" class="max-w-full shadow-lg rounded border border-gray-200 transition-transform duration-200" style="transform: scale(1);">
                         @else
                             <div class="text-center text-gray-400">
                                 <svg class="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -177,6 +215,7 @@
                             </div>
                         @endif
                     </div>
+
                     <div class="p-4 border-t border-gray-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div class="flex items-center gap-3 w-full sm:w-auto">
                             <p class="text-xs font-bold text-gray-600">Antrean Berkas: <span class="text-gray-900">{{ $posisiSekarang }} dari {{ $totalAntrean }}</span></p>
@@ -267,8 +306,34 @@
         </div>
     </main>
 
-    <!-- Script Utama (Zoom, Form, Berger Menu) -->
     <script>
+        // FUNGSI GANTI PREVIEW DOKUMEN (TAB SWITCHER)
+        function changePreview(url, title, btnElement) {
+            const previewImg = document.getElementById('doc-preview');
+            const previewTitle = document.getElementById('preview-title');
+            const downloadBtn = document.getElementById('download-btn');
+            
+            if (previewImg) {
+                previewImg.src = url;
+                previewTitle.innerText = title;
+                downloadBtn.href = url;
+                downloadBtn.setAttribute('download', 'Berkas_' + title.replace(/ /g, '_') + '_{{ $santri->nama_lengkap }}');
+                
+                // Reset Zoom
+                currentScale = 1;
+                previewImg.style.transform = `scale(1)`;
+                
+                // Styling active tab
+                document.querySelectorAll('.doc-tab').forEach(el => {
+                    el.classList.remove('bg-emerald-100', 'text-emerald-800');
+                    el.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                });
+                
+                btnElement.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                btnElement.classList.add('bg-emerald-100', 'text-emerald-800');
+            }
+        }
+
         // FUNGSI ZOOM IN / ZOOM OUT DOKUMEN
         let currentScale = 1;
         const img = document.getElementById('doc-preview');
@@ -296,9 +361,9 @@
 
             if(!allChecked) {
                 alert("Mohon centang semua kotak parameter verifikasi sebelum menyetujui berkas!");
-                return false; // Mencegah form terkirim
+                return false;
             }
-            return true; // Form terkirim jika semua dicentang
+            return true;
         }
 
         // FUNGSI VALIDASI CATATAN SEBELUM TOLAK
@@ -329,7 +394,6 @@
                     if (mobileMenu.classList.contains('hidden')) {
                         menuIcon.setAttribute('d', 'M4 6h16M4 12h16m-7 6h7');
                     } else {
-                        // Mengubah icon burger menjadi silang (X)
                         menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
                     }
                 });
