@@ -161,7 +161,7 @@
                     @endif
                 </div>
 
-                <form action="{{ route('pendaftaran.step2.store') }}" method="POST">
+                <form action="{{ route('pendaftaran.step2.store') }}" method="POST"  novalidate>
                     @csrf
                     
                     <div class="space-y-8">

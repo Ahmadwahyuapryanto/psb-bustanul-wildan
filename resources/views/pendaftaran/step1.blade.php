@@ -127,7 +127,7 @@
                     </p>
                 </div>
 
-                <form action="{{ route('pendaftaran.step1.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('pendaftaran.step1.store') }}" method="POST" enctype="multipart/form-data"  novalidate>
                     @csrf
                     
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

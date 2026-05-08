@@ -169,7 +169,7 @@
                     </p>
                 </div>
 
-                <form action="{{ route('pendaftaran.step3.store') }}" method="POST">
+                <form action="{{ route('pendaftaran.step3.store') }}" method="POST"  novalidate>
                     @csrf
                     
                     <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 mb-6">

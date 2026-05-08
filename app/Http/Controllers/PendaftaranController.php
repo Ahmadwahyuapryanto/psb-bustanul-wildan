@@ -34,6 +34,21 @@ class PendaftaranController extends Controller
             'provinsi' => 'required|string',
             'kabupaten' => 'required|string',
             'pas_foto' => 'image|mimes:jpeg,png,jpg|max:2048'
+            ], [
+        // Pesan Error Kustom
+        'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+        'nik.required' => 'NIK wajib diisi.',
+        'nik.numeric' => 'NIK harus berupa angka.',
+        'nik.digits' => 'NIK harus tepat 16 digit.',
+        'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+        'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
+        'jenis_kelamin.required' => 'Pilih jenis kelamin santri.',
+        'alamat.required' => 'Alamat lengkap wajib diisi.',
+        'provinsi.required' => 'Provinsi belum dipilih.',
+        'kabupaten.required' => 'Kabupaten belum dipilih.',
+        'pas_foto.image' => 'File harus berupa gambar.',
+        'pas_foto.mimes' => 'Format foto harus jpeg, png, atau jpg.',
+        'pas_foto.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
         // Proses Unggah Pas Foto ke SUPABASE
@@ -81,6 +96,14 @@ class PendaftaranController extends Controller
             'nama_ibu' => 'required', 'nik_ibu' => 'required|digits:16', 'pendidikan_ibu' => 'required',
             'pekerjaan_ibu' => 'required', 'penghasilan_ibu' => 'required',
             'no_wa_darurat' => 'required|numeric',
+            ], [
+        'nama_ayah.required' => 'Nama ayah wajib diisi.',
+        'pekerjaan_ayah.required' => 'Pekerjaan ayah wajib diisi.',
+        'no_wa_darurat.required' => 'Nomor WA darurat wajib diisi.',
+        'nama_ibu.required' => 'Nama ibu wajib diisi.',
+        'pekerjaan_ibu.required' => 'Pekerjaan ibu wajib diisi.',
+        'pendidikan_ibu.required' => 'Pilih pendidikan terakhir ibu.',
+
         ]);
 
         $santri = Santri::where('user_id', Auth::id())->firstOrFail();
@@ -139,6 +162,13 @@ class PendaftaranController extends Controller
             'kartu_keluarga' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'ijazah' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'pas_foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', 
+            ], [
+        'kartu_keluarga.mimes' => 'Format file KK harus PDF, JPG, atau PNG.',
+        'kartu_keluarga.max' => 'Ukuran file KK maksimal 2MB.',
+        'akta_kelahiran.mimes' => 'Format file Akta harus PDF, JPG, atau PNG.',
+        'akta_kelahiran.max' => 'Ukuran file Akta maksimal 2MB.',
+        'ijazah.mimes' => 'Format file Ijazah harus PDF, JPG, atau PNG.',
+        'ijazah.max' => 'Ukuran file Ijazah maksimal 2MB.',
         ]);
 
         $santri = Santri::where('user_id', Auth::id())->firstOrFail();
